@@ -5,6 +5,50 @@
 const API_BASE = '/api';
 
 export const API = {
+  async sellerLogin(email, password) {
+    const res = await fetch(`${API_BASE}/seller-auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    if (!res.ok) {
+      const error = await res.json().catch(() => ({}));
+      throw new Error(error.message || 'Seller login failed');
+    }
+    return res.json();
+  },
+
+  async getDeliveries(sellerId) {
+    const res = await fetch(`${API_BASE}/deliveries?sellerId=${encodeURIComponent(sellerId)}`);
+    if (!res.ok) throw new Error('Could not load deliveries');
+    return res.json();
+  },
+
+  async createDelivery(delivery) {
+    const res = await fetch(`${API_BASE}/deliveries`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(delivery)
+    });
+    if (!res.ok) throw new Error('Could not create delivery');
+    return res.json();
+  },
+
+  async updateDelivery(id, delivery) {
+    const res = await fetch(`${API_BASE}/deliveries/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(delivery)
+    });
+    if (!res.ok) throw new Error('Could not update delivery');
+    return res.json();
+  },
+
+  async deleteDelivery(id) {
+    const res = await fetch(`${API_BASE}/deliveries/${id}`, { method: 'DELETE' });
+    if (!res.ok) throw new Error('Could not delete delivery');
+  },
+
   async getCategories() {
     try {
       const res = await fetch(`${API_BASE}/categories`);

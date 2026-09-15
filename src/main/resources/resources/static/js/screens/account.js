@@ -6,7 +6,12 @@ import { Store } from '../store.js';
 
 export const AccountScreen = {
   render() {
-    const user = Store.state.user;
+    const user = Store.state.user || {
+      name: 'Guest shopper',
+      email: 'Sign in to manage your account',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
+      address: 'No saved delivery address'
+    };
 
     return `
       <div class="account-page">
@@ -71,6 +76,18 @@ export const AccountScreen = {
             </div>
           </div>
 
+          <div class="account-card glass seller-account-card">
+            <div class="card-heading-row">
+              <span class="heading-icon">🏪</span>
+              <h2>Seller account</h2>
+            </div>
+            <p class="account-help">Manage deliveries and keep your storefront moving.</p>
+            <div class="account-actions">
+              <a href="#/seller-dashboard" class="btn btn-primary btn-liquid">Open Seller Dashboard</a>
+              <button id="logout-btn" class="btn btn-glass">Log out</button>
+            </div>
+          </div>
+
           <!-- Saved Shipping Address -->
           <div class="account-card glass">
             <div class="card-heading-row">
@@ -89,5 +106,11 @@ export const AccountScreen = {
     `;
   },
 
-  afterRender() {}
+  afterRender() {
+    document.getElementById('logout-btn')?.addEventListener('click', () => {
+      Store.logout();
+      window.location.hash = '#/';
+      Store.toast('You have been logged out.', 'info');
+    });
+  }
 };
