@@ -13,6 +13,7 @@ export const Store = {
   state: {
     cart: JSON.parse(localStorage.getItem('jb_cart') || '[]'),
     wishlist: JSON.parse(localStorage.getItem('jb_wishlist') || '[]'),
+    seller: JSON.parse(localStorage.getItem('jb_seller') || 'null'),
     currency: localStorage.getItem('jb_currency') || 'USD',
     darkMode: localStorage.getItem('jb_theme') === 'dark',
     user: JSON.parse(localStorage.getItem('jb_user') || 'null') || {
@@ -23,6 +24,20 @@ export const Store = {
     },
     activePromo: null,
     discountAmount: 0
+  },
+
+  setSeller(seller) {
+    this.state.seller = seller;
+    localStorage.setItem('jb_seller', JSON.stringify(seller));
+    this.dispatch('seller-changed', seller);
+  },
+
+  logout() {
+    this.state.user = null;
+    this.state.seller = null;
+    localStorage.removeItem('jb_user');
+    localStorage.removeItem('jb_seller');
+    this.dispatch('auth-changed');
   },
 
   // ── Cart Operations ──

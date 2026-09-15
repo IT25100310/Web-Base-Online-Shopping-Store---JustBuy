@@ -1,6 +1,7 @@
 package com.justbuy.model;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
 import java.math.BigDecimal;
 
@@ -17,6 +18,7 @@ public class OrderItem {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
+    @JsonBackReference
     private Order order;
 
     private Long productId;
