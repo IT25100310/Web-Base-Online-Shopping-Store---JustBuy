@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Inventory Details - E-Shop Inventory</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div th:replace="~{fragments/layout :: nav}"></div>
+<main class="container">
+<div th:replace="~{fragments/layout :: messages}"></div>
+<div class="page-header"><div><p class="eyebrow">Inventory Details</p><h1 th:text="${item.productName}"></h1><p class="muted" th:text="${item.sku + ' · ' + item.vendorName}"></p></div><div class="actions"><a class="btn" th:href="@{/inventory/{id}/adjust(id=${item.id})}">Adjust Stock</a><a class="btn ghost" th:href="@{/inventory/{id}/edit(id=${item.id})}">Edit</a></div></div>
+<div class="cards detail-cards">
+    <div class="card metric"><span>Quantity</span><strong th:text="${item.quantity}"></strong></div>
+    <div class="card metric"><span>Reorder Threshold</span><strong th:text="${item.reorderThreshold}"></strong></div>
+    <div class="card metric"><span>Location</span><strong class="metric-text" th:text="${item.location.name}"></strong></div>
+    <div class="card metric"><span>Stock Value</span><strong class="metric-text" th:text="${'LKR ' + #numbers.formatDecimal(item.stockValue,1,2)}"></strong></div>
+</div>
+<section class="card"><div class="section-title"><h2>Transaction History</h2></div><table><thead><tr><th>Time</th><th>Type</th><th>Change</th><th>Before</th><th>After</th><th>Reference</th><th>By</th></tr></thead><tbody><tr th:each="t : ${transactions}"><td th:text="${#temporals.format(t.createdAt,'dd MMM yyyy HH:mm')}"></td><td th:text="${t.type.label}"></td><td th:text="${t.quantityChanged > 0 ? '+' + t.quantityChanged : t.quantityChanged}"></td><td th:text="${t.previousQuantity}"></td><td th:text="${t.newQuantity}"></td><td th:text="${t.referenceId ?: '-'}"></td><td th:text="${t.performedBy}"></td></tr></tbody></table></section>
+</main>
+</body>
+</html>

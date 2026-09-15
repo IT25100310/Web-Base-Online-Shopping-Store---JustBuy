@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Low Stock Alerts - E-Shop Inventory</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div th:replace="~{fragments/layout :: nav}"></div>
+<main class="container">
+<div th:replace="~{fragments/layout :: messages}"></div>
+<div class="page-header"><div><p class="eyebrow">Automatic Monitoring</p><h1>Low-Stock Alerts</h1><p class="muted">Alerts are generated when stock is at or below its reorder threshold.</p></div></div>
+<div class="card table-card"><table><thead><tr><th>Created</th><th>SKU</th><th>Product</th><th>Vendor</th><th>Current Qty</th><th>Threshold</th><th>Action</th></tr></thead><tbody><tr th:each="a : ${alerts}"><td th:text="${#temporals.format(a.createdAt,'dd MMM HH:mm')}"></td><td th:text="${a.item.sku}"></td><td th:text="${a.item.productName}"></td><td th:text="${a.item.vendorName}"></td><td><span class="badge danger" th:text="${a.item.quantity}"></span></td><td th:text="${a.reorderThreshold}"></td><td class="actions"><a class="btn tiny" th:href="@{/inventory/{id}/adjust(id=${a.item.id})}">Restock</a><form th:action="@{/alerts/{id}/resolve(id=${a.id})}" method="post"><button class="btn tiny ghost" type="submit">Mark Reviewed</button></form></td></tr></tbody></table><div class="empty" th:if="${#lists.isEmpty(alerts)}">No open low-stock alerts.</div></div>
+</main>
+</body>
+</html>

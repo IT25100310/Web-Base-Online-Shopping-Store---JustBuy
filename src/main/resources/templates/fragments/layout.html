@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<nav th:fragment="nav" class="topbar">
+    <a class="brand" th:href="@{/}">E-Shop Inventory</a>
+    <div class="nav-links">
+        <a th:href="@{/}">Dashboard</a>
+        <a th:href="@{/inventory}">Inventory</a>
+        <a th:href="@{/alerts}">Low Stock Alerts</a>
+        <a th:href="@{/locations}">Locations</a>
+        <a th:href="@{/reports}">Reports</a>
+        <a th:href="@{/inventory/audit}">Audit</a>
+        <a th:href="@{/availability}">Availability</a>
+    </div>
+</nav>
+<div th:fragment="messages">
+    <div class="flash success" th:if="${success}" th:text="${success}"></div>
+    <div class="flash error" th:if="${error}" th:text="${error}"></div>
+</div>
+</body>
+</html>
