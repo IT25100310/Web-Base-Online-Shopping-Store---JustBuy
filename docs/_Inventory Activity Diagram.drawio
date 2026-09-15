@@ -1,0 +1,294 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Page-1" id="Z8wDGzHqc-EmEyvGiHc8">
+    <mxGraphModel dx="1857" dy="561" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-1" parent="1" style="swimlane;whiteSpace=wrap;html=1;" value="Seller" vertex="1">
+          <mxGeometry height="1820" width="230" x="-190" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-7" parent="NeCdEXtL4gca4yGD1XB1-1" style="ellipse;html=1;shape=startState;fillColor=#000000;strokeColor=#ff0000;" value="" vertex="1">
+          <mxGeometry height="30" width="30" x="100" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-8" edge="1" parent="NeCdEXtL4gca4yGD1XB1-1" source="NeCdEXtL4gca4yGD1XB1-7" style="edgeStyle=orthogonalEdgeStyle;html=1;verticalAlign=bottom;endArrow=open;endSize=8;strokeColor=#ff0000;rounded=0;" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="115" y="130" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-9" parent="NeCdEXtL4gca4yGD1XB1-1" style="rounded=1;whiteSpace=wrap;html=1;" value="Add New Product / Update Stock Quantity" vertex="1">
+          <mxGeometry height="50" width="170" x="30" y="130" as="geometry" />
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-27" parent="NeCdEXtL4gca4yGD1XB1-1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;" value="Notify - Restock Needed" vertex="1">
+          <mxGeometry height="50" width="170" x="20" y="1180" as="geometry" />
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-34" parent="NeCdEXtL4gca4yGD1XB1-1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;" value="Restock Product" vertex="1">
+          <mxGeometry height="50" width="170" x="20" y="1610" as="geometry" />
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-42" edge="1" parent="NeCdEXtL4gca4yGD1XB1-1" style="endArrow=classic;html=1;rounded=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="NeCdEXtL4gca4yGD1XB1-9" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="104.5" y="1610" as="sourcePoint" />
+            <mxPoint x="104.5" y="1550" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-43" connectable="0" parent="NeCdEXtL4gca4yGD1XB1-42" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="Restock Received" vertex="1">
+          <mxGeometry relative="1" x="-0.085" y="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-2" parent="1" style="swimlane;whiteSpace=wrap;html=1;" value="System" vertex="1">
+          <mxGeometry height="1820" width="230" x="40" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-45" edge="1" parent="NeCdEXtL4gca4yGD1XB1-2" source="NeCdEXtL4gca4yGD1XB1-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="NeCdEXtL4gca4yGD1XB1-13" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-10" parent="NeCdEXtL4gca4yGD1XB1-2" style="rounded=1;whiteSpace=wrap;html=1;" value="Validate Stock Entry" vertex="1">
+          <mxGeometry height="50" width="170" x="30" y="130" as="geometry" />
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-11" edge="1" parent="NeCdEXtL4gca4yGD1XB1-2" style="endArrow=classic;startArrow=classic;html=1;rounded=0;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="-30" y="159.5" as="sourcePoint" />
+            <mxPoint x="30" y="159.5" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-68" edge="1" parent="NeCdEXtL4gca4yGD1XB1-2" source="NeCdEXtL4gca4yGD1XB1-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="NeCdEXtL4gca4yGD1XB1-14" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-13" parent="NeCdEXtL4gca4yGD1XB1-2" style="shape=rhombus;perimeter=rhombusPerimeter;whiteSpace=wrap;html=1;align=center;" value="Data Valid ?" vertex="1">
+          <mxGeometry height="60" width="120" x="55" y="210" as="geometry" />
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-14" parent="NeCdEXtL4gca4yGD1XB1-2" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;" value="Update Inventory Database" vertex="1">
+          <mxGeometry height="50" width="170" x="30" y="310" as="geometry" />
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-15" parent="NeCdEXtL4gca4yGD1XB1-2" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;" value="Check Stock Level vs Reorder&lt;br&gt;Threshold" vertex="1">
+          <mxGeometry height="50" width="170" x="30" y="400" as="geometry" />
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-16" parent="NeCdEXtL4gca4yGD1XB1-2" style="shape=rhombus;perimeter=rhombusPerimeter;whiteSpace=wrap;html=1;align=center;" value="Stock Below Threshold ?" vertex="1">
+          <mxGeometry height="60" width="120" x="55" y="490" as="geometry" />
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-17" parent="NeCdEXtL4gca4yGD1XB1-2" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;" value="Generate Low Stock Alert" vertex="1">
+          <mxGeometry height="50" width="170" x="30" y="580" as="geometry" />
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-18" parent="NeCdEXtL4gca4yGD1XB1-2" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;" value="Notify Seller &amp;amp; Admin" vertex="1">
+          <mxGeometry height="50" width="170" x="30" y="660" as="geometry" />
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-19" parent="NeCdEXtL4gca4yGD1XB1-2" style="shape=rhombus;perimeter=rhombusPerimeter;whiteSpace=wrap;html=1;align=center;" value="" vertex="1">
+          <mxGeometry height="40" width="41.25" x="94.36999999999999" y="750" as="geometry" />
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-101" edge="1" parent="NeCdEXtL4gca4yGD1XB1-2" source="NeCdEXtL4gca4yGD1XB1-20" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="NeCdEXtL4gca4yGD1XB1-21" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-20" parent="NeCdEXtL4gca4yGD1XB1-2" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;" value="Monitor For New Customer Orders" vertex="1">
+          <mxGeometry height="50" width="170" x="30" y="820" as="geometry" />
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-21" parent="NeCdEXtL4gca4yGD1XB1-2" style="shape=rhombus;perimeter=rhombusPerimeter;whiteSpace=wrap;html=1;align=center;" value="Order Placed ?" vertex="1">
+          <mxGeometry height="60" width="120" x="54.99000000000001" y="910" as="geometry" />
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-22" parent="NeCdEXtL4gca4yGD1XB1-2" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;" value="Deduct Stock Quantity" vertex="1">
+          <mxGeometry height="50" width="170" x="29.99000000000001" y="1000" as="geometry" />
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-24" parent="NeCdEXtL4gca4yGD1XB1-2" style="shape=rhombus;perimeter=rhombusPerimeter;whiteSpace=wrap;html=1;align=center;" value="Stock = 0 ?" vertex="1">
+          <mxGeometry height="60" width="120" x="54.99" y="1080" as="geometry" />
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-25" parent="NeCdEXtL4gca4yGD1XB1-2" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;" value="Make Products as Out Of Stock" vertex="1">
+          <mxGeometry height="50" width="170" x="30.010000000000005" y="1170" as="geometry" />
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-26" parent="NeCdEXtL4gca4yGD1XB1-2" style="shape=rhombus;perimeter=rhombusPerimeter;whiteSpace=wrap;html=1;align=center;" value="" vertex="1">
+          <mxGeometry height="40" width="41.25" x="94.38" y="1260" as="geometry" />
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-35" edge="1" parent="NeCdEXtL4gca4yGD1XB1-2" style="endArrow=classic;html=1;rounded=0;entryX=1;entryY=0.25;entryDx=0;entryDy=0;" target="NeCdEXtL4gca4yGD1XB1-34" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="285" y="1619.5" as="sourcePoint" />
+            <mxPoint x="215" y="1619.5" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-36" connectable="0" parent="NeCdEXtL4gca4yGD1XB1-35" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="Yes" vertex="1">
+          <mxGeometry relative="1" x="0.0905" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-44" edge="1" parent="NeCdEXtL4gca4yGD1XB1-2" style="endArrow=classic;html=1;rounded=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="NeCdEXtL4gca4yGD1XB1-13" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="114.5" y="180" as="sourcePoint" />
+            <mxPoint x="114.5" y="210" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-67" edge="1" parent="NeCdEXtL4gca4yGD1XB1-2" style="endArrow=classic;html=1;rounded=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="NeCdEXtL4gca4yGD1XB1-14" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="114.49000000000001" y="270" as="sourcePoint" />
+            <mxPoint x="114.49000000000001" y="310" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-69" connectable="0" parent="NeCdEXtL4gca4yGD1XB1-67" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="Yes" vertex="1">
+          <mxGeometry relative="1" x="-0.221" y="-1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-73" edge="1" parent="NeCdEXtL4gca4yGD1XB1-2" style="endArrow=none;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="55" y="240" as="sourcePoint" />
+            <mxPoint x="5" y="160" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-74" connectable="0" parent="NeCdEXtL4gca4yGD1XB1-73" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="No" vertex="1">
+          <mxGeometry relative="1" x="-0.48" y="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-75" edge="1" parent="NeCdEXtL4gca4yGD1XB1-2" style="endArrow=classic;html=1;rounded=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="NeCdEXtL4gca4yGD1XB1-15" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="114.49000000000001" y="360" as="sourcePoint" />
+            <mxPoint x="114.99000000000001" y="390" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-76" edge="1" parent="NeCdEXtL4gca4yGD1XB1-2" style="endArrow=classic;html=1;rounded=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="NeCdEXtL4gca4yGD1XB1-16" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="114.49000000000001" y="450" as="sourcePoint" />
+            <mxPoint x="114.99000000000001" y="480" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-79" edge="1" parent="NeCdEXtL4gca4yGD1XB1-2" style="endArrow=classic;html=1;rounded=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="NeCdEXtL4gca4yGD1XB1-19" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="114.5" y="550" as="sourcePoint" />
+            <mxPoint x="114.5" y="580" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-84" connectable="0" parent="NeCdEXtL4gca4yGD1XB1-79" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="Yes" vertex="1">
+          <mxGeometry relative="1" x="-0.876" y="-1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-117" connectable="0" parent="NeCdEXtL4gca4yGD1XB1-79" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="No" vertex="1">
+          <mxGeometry relative="1" x="-0.0561" y="-2" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-80" edge="1" parent="NeCdEXtL4gca4yGD1XB1-2" style="endArrow=classic;html=1;rounded=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="NeCdEXtL4gca4yGD1XB1-20" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="114.5" y="790" as="sourcePoint" />
+            <mxPoint x="115" y="820" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-81" edge="1" parent="NeCdEXtL4gca4yGD1XB1-2" style="endArrow=classic;html=1;rounded=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="NeCdEXtL4gca4yGD1XB1-21" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="114.5" y="870" as="sourcePoint" />
+            <mxPoint x="115" y="900" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-82" edge="1" parent="NeCdEXtL4gca4yGD1XB1-2" style="endArrow=classic;html=1;rounded=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="NeCdEXtL4gca4yGD1XB1-22" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="114.5" y="970" as="sourcePoint" />
+            <mxPoint x="115" y="1000" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-83" connectable="0" parent="NeCdEXtL4gca4yGD1XB1-82" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="Yes" vertex="1">
+          <mxGeometry relative="1" x="-0.2405" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-85" edge="1" parent="NeCdEXtL4gca4yGD1XB1-2" source="NeCdEXtL4gca4yGD1XB1-22" style="endArrow=classic;html=1;rounded=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="NeCdEXtL4gca4yGD1XB1-24" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points" />
+            <mxPoint x="114.50000000000001" y="1050" as="sourcePoint" />
+            <mxPoint x="115.00000000000001" y="1080" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-41" edge="1" parent="NeCdEXtL4gca4yGD1XB1-2" style="endArrow=classic;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="NeCdEXtL4gca4yGD1XB1-29" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="135.63" y="1280" as="sourcePoint" />
+            <mxPoint x="345.01" y="1360.5" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-102" edge="1" parent="NeCdEXtL4gca4yGD1XB1-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="114.50999999999999" y="1140" as="sourcePoint" />
+            <mxPoint x="114.50999999999999" y="1170" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-103" edge="1" parent="NeCdEXtL4gca4yGD1XB1-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="114.49000000000001" y="1220" as="sourcePoint" />
+            <mxPoint x="114.49000000000001" y="1260" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-111" connectable="0" parent="NeCdEXtL4gca4yGD1XB1-103" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="No" vertex="1">
+          <mxGeometry relative="1" x="-0.1239" y="-2" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-106" parent="NeCdEXtL4gca4yGD1XB1-2" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Yes" vertex="1">
+          <mxGeometry height="21" width="41.25" x="85.01" y="1139" as="geometry" />
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-112" edge="1" parent="NeCdEXtL4gca4yGD1XB1-2" style="endArrow=classic;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;entryX=1;entryY=1;entryDx=0;entryDy=0;" target="NeCdEXtL4gca4yGD1XB1-27" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="94.38" y="1279.5" as="sourcePoint" />
+            <mxPoint x="-40" y="1279.5" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-113" edge="1" parent="NeCdEXtL4gca4yGD1XB1-2" style="endArrow=classic;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="NeCdEXtL4gca4yGD1XB1-25" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="175" y="939.5" as="sourcePoint" />
+            <mxPoint x="210" y="939.5" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-114" connectable="0" parent="NeCdEXtL4gca4yGD1XB1-113" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="No" vertex="1">
+          <mxGeometry relative="1" x="-0.801" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-115" edge="1" parent="NeCdEXtL4gca4yGD1XB1-2" source="NeCdEXtL4gca4yGD1XB1-25" style="endArrow=none;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="114.50999999999999" y="1211" as="sourcePoint" />
+            <mxPoint x="114.50999999999999" y="1170" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-116" edge="1" parent="NeCdEXtL4gca4yGD1XB1-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="NeCdEXtL4gca4yGD1XB1-28">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="200.01" y="684.5" as="sourcePoint" />
+            <mxPoint x="260.01" y="684.5" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-3" parent="1" style="swimlane;whiteSpace=wrap;html=1;" value="Admin" vertex="1">
+          <mxGeometry height="1820" width="230" x="270" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-28" parent="NeCdEXtL4gca4yGD1XB1-3" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;" value="Receive &amp;amp; Review Alert" vertex="1">
+          <mxGeometry height="50" width="170" x="40" y="660" as="geometry" />
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-29" parent="NeCdEXtL4gca4yGD1XB1-3" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;" value="Generate Inventory Report" vertex="1">
+          <mxGeometry height="50" width="170" x="30" y="1370" as="geometry" />
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-30" parent="NeCdEXtL4gca4yGD1XB1-3" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;align=center;" value="Review Inventory Report" vertex="1">
+          <mxGeometry height="50" width="170" x="30" y="1470" as="geometry" />
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-31" parent="NeCdEXtL4gca4yGD1XB1-3" style="shape=rhombus;perimeter=rhombusPerimeter;whiteSpace=wrap;html=1;align=center;" value="Approve Restock Request ?" vertex="1">
+          <mxGeometry height="100" width="120" x="55" y="1570" as="geometry" />
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-32" parent="NeCdEXtL4gca4yGD1XB1-3" style="ellipse;html=1;shape=endState;fillColor=#000000;strokeColor=#ff0000;" value="" vertex="1">
+          <mxGeometry height="30" width="30" x="100" y="1730" as="geometry" />
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-37" edge="1" parent="NeCdEXtL4gca4yGD1XB1-3" style="endArrow=classic;html=1;rounded=0;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="114.5" y="1670" as="sourcePoint" />
+            <mxPoint x="114.5" y="1730" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-38" connectable="0" parent="NeCdEXtL4gca4yGD1XB1-37" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="No" vertex="1">
+          <mxGeometry relative="1" x="-0.2" y="-1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-39" edge="1" parent="NeCdEXtL4gca4yGD1XB1-3" style="endArrow=classic;html=1;rounded=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="NeCdEXtL4gca4yGD1XB1-30" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="114.5" y="1420" as="sourcePoint" />
+            <mxPoint x="114.5" y="1460" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="NeCdEXtL4gca4yGD1XB1-40" edge="1" parent="NeCdEXtL4gca4yGD1XB1-3" style="endArrow=classic;html=1;rounded=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="NeCdEXtL4gca4yGD1XB1-31" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="114.5" y="1520" as="sourcePoint" />
+            <mxPoint x="114.5" y="1560" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

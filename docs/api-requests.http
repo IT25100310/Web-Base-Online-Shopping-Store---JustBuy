@@ -1,0 +1,35 @@
+### Check availability
+GET http://localhost:8080/api/inventory/availability/MOU-101?quantity=2
+
+### Simulate an order - deduct stock
+POST http://localhost:8080/api/inventory/order
+Content-Type: application/json
+
+{
+  "sku": "MOU-101",
+  "quantity": 2,
+  "referenceId": "ORD-1001",
+  "performedBy": "Order Module"
+}
+
+### Simulate order cancellation - restore stock
+POST http://localhost:8080/api/inventory/cancel
+Content-Type: application/json
+
+{
+  "sku": "MOU-101",
+  "quantity": 2,
+  "referenceId": "ORD-1001",
+  "performedBy": "Order Module"
+}
+
+### Simulate returned item - restore stock
+POST http://localhost:8080/api/inventory/return
+Content-Type: application/json
+
+{
+  "sku": "MOU-101",
+  "quantity": 1,
+  "referenceId": "RTN-1001",
+  "performedBy": "Delivery Module"
+}
