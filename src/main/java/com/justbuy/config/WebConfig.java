@@ -17,6 +17,6 @@ public class WebConfig implements WebMvcConfigurer {
     // SPA entry point for the storefront assets.
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("/").setViewName("forward:/static/HTML/index.html");
+        registry.addViewController("/").setViewName("forward:/HTML/index.html");
     }
 }

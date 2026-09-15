@@ -1,6 +1,7 @@
 package com.justbuy.model;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -41,6 +42,7 @@ public class Order {
     private BigDecimal discount;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "order")
+    @JsonManagedReference
     private List<OrderItem> items = new ArrayList<>();
 
     @Column(updatable = false)
