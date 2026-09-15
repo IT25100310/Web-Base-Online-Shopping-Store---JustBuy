@@ -23,11 +23,14 @@ public class ProductController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "popular") String sort,
-            @RequestParam(required = false) Long categoryId) {
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) String category) {
 
         List<Product> products;
         if (categoryId != null) {
             products = productService.getByCategory(categoryId, page, size, sort);
+        } else if (category != null && !category.isBlank()) {
+            products = productService.getByCategoryName(category, page, size, sort);
         } else {
             products = productService.getAll(page, size);
         }
