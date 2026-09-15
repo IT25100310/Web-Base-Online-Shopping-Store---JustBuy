@@ -13,18 +13,25 @@ public class SupportTicketService {
     @Autowired
     private SupportTicketRepository ticketRepository;
 
-    // UC-CS-01: Create new ticket
     public SupportTicket createTicket(SupportTicket ticket) {
         ticket.setStatus("Open");
         return ticketRepository.save(ticket);
     }
 
-    // UC-CS-02: Get all tickets for dashboard[cite: 1]
     public List<SupportTicket> getAllTickets() {
         return ticketRepository.findAll();
     }
 
-    // UC-CS-02: Resolve ticket[cite: 1]
+    // Mark ticket as In Progress
+    public SupportTicket startProgress(Long id) {
+        SupportTicket ticket = ticketRepository.findById(id).orElse(null);
+        if (ticket != null) {
+            ticket.setStatus("In Progress");
+            return ticketRepository.save(ticket);
+        }
+        return null;
+    }
+
     public SupportTicket resolveTicket(Long id, String response) {
         SupportTicket ticket = ticketRepository.findById(id).orElse(null);
         if (ticket != null) {
@@ -35,11 +42,18 @@ public class SupportTicketService {
         return null;
     }
 
-    // UC-CS-02: Escalate ticket
-    public SupportTicket escalateTicket(Long id) {
+    // Delete ticket by ID
+    public void deleteTicket(Long id) {
+        ticketRepository.deleteById(id);
+    }
+
+    //Update ticket
+    public SupportTicket updateTicket(Long id, SupportTicket updatedTicket) {
         SupportTicket ticket = ticketRepository.findById(id).orElse(null);
-        if (ticket != null) {
-            ticket.setStatus("Escalated");
+        if (ticket != null && "Open".equalsIgnoreCase(ticket.getStatus())) {
+            ticket.setCategory(updatedTicket.getCategory());
+            ticket.setSubject(updatedTicket.getSubject());
+            ticket.setDescription(updatedTicket.getDescription());
             return ticketRepository.save(ticket);
         }
         return null;
