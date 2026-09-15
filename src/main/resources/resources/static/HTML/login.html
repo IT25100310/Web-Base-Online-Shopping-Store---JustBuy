@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign In — JustBuy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/tokens.css" />
+  <link rel="stylesheet" href="../css/base.css" />
+  <link rel="stylesheet" href="../css/components.css" />
+  <link rel="stylesheet" href="../css/animations.css" />
+</head>
+<body>
+  <canvas id="bg-shader-canvas"></canvas>
+
+  <nav id="navbar" class="glass">
+    <div class="nav-inner">
+      <a href="index.html#/" class="nav-logo">
+        <span class="logo-mark">⚡</span>
+        <span class="logo-name">Just<span class="logo-accent">Buy</span></span>
+      </a>
+    </div>
+  </nav>
+
+  <main class="auth-page">
+    <div class="auth-card glass-lg">
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-tab="signin">Sign In</button>
+        <button class="auth-tab" data-tab="signup">Create Account</button>
+      </div>
+
+      <form class="auth-form" id="auth-form">
+        <h2>Welcome back</h2>
+        <p class="auth-sub" id="auth-sub">Access your orders, wishlist and escrow wallet.</p>
+
+        <label id="name-field" style="display:none">Full name
+          <input type="text" id="auth-name" placeholder="Alexander Wright" />
+        </label>
+        <label>Email address
+          <input type="email" id="auth-email" placeholder="alex.wright@justbuy.design" required />
+        </label>
+        <label>Password
+          <input type="password" id="auth-pass" placeholder="••••••••" required />
+        </label>
+
+        <div class="auth-row" id="auth-extra-row">
+          <label class="auth-check"><input type="checkbox" checked /> Remember me</label>
+          <a class="auth-link" href="#" onclick="return false">Forgot password?</a>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-liquid btn-block" id="auth-submit">Sign In →</button>
+        <div class="auth-error" id="auth-error"></div>
+        <div class="auth-demo glass">Demo — any email + password works. Data stays in your browser.</div>
+      </form>
+    </div>
+  </main>
+
+  <script type="module">
+    import { Store } from '../js/store.js';
+    import { ShaderGradient } from '../js/shader-gradient.js';
+    Store.initTheme();
+    try { new ShaderGradient('bg-shader-canvas'); } catch(e) {}
+
+    let mode = 'signin';
+    const tabs = document.querySelectorAll('.auth-tab');
+    const nameField = document.getElementById('name-field');
+    const sub = document.getElementById('auth-sub');
+    const submit = document.getElementById('auth-submit');
+    const err = document.getElementById('auth-error');
+
+    tabs.forEach(t => t.addEventListener('click', () => {
+      tabs.forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+      mode = t.dataset.tab;
+      const signup = mode === 'signup';
+      nameField.style.display = signup ? 'block' : 'none';
+      sub.textContent = signup ? 'Join 2M+ members of the 2026 marketplace.' : 'Access your orders, wishlist and escrow wallet.';
+      submit.textContent = signup ? 'Create Account →' : 'Sign In →';
+      err.textContent = '';
+    }));
+
+    document.getElementById('auth-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = document.getElementById('auth-email').value.trim();
+      const pass = document.getElementById('auth-pass').value;
+      if (!email.includes('@') || pass.length < 4) {
+        err.textContent = 'Enter a valid email and a password of 4+ characters.';
+        return;
+      }
+      const name = document.getElementById('auth-name').value.trim() || 'Alexander Wright';
+      Store.state.user = { ...Store.state.user, name, email };
+      localStorage.setItem('jb_user', JSON.stringify(Store.state.user));
+      Store.toast(`Welcome, ${name.split(' ')[0]}!`, 'success');
+      setTimeout(() => window.location.href = 'index.html#/', 500);
+    });
+  </script>
+</body>
+</html>
