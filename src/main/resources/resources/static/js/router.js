@@ -12,6 +12,7 @@ import { DealsScreen } from './screens/deals.js';
 import { WishlistScreen } from './screens/wishlist.js';
 import { SellerScreen } from './screens/seller.js';
 import { AccountScreen } from './screens/account.js';
+import { SellerDashboardScreen } from './screens/seller-dashboard.js';
 
 export const Router = {
   routes: [
@@ -24,7 +25,8 @@ export const Router = {
     { pattern: /^#\/deals/, screen: DealsScreen },
     { pattern: /^#\/wishlist/, screen: WishlistScreen },
     { pattern: /^#\/seller\/\w+/, screen: SellerScreen },
-    { pattern: /^#\/account/, screen: AccountScreen }
+    { pattern: /^#\/account/, screen: AccountScreen },
+    { pattern: /^#\/seller-dashboard/, screen: SellerDashboardScreen }
   ],
 
   async handleRoute() {
