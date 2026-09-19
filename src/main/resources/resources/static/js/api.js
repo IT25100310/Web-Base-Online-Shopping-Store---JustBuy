@@ -5,6 +5,112 @@
 const API_BASE = '/api';
 
 export const API = {
+  async adminLogin(email, password) {
+    const res = await fetch(`${API_BASE}/admin-auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.message || 'Admin login failed');
+    return data;
+  },
+
+  async getAccountApplications(status = '') {
+    const query = status ? `?status=${encodeURIComponent(status)}` : '';
+    const res = await fetch(`${API_BASE}/account-applications${query}`);
+    if (!res.ok) throw new Error('Could not load account applications');
+    return res.json();
+  },
+
+  async updateAccountApplicationStatus(id, status) {
+    const res = await fetch(`${API_BASE}/account-applications/${id}/status`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.message || 'Could not update application');
+    return data;
+  },
+
+  async getAdminAccounts() {
+    const res = await fetch(`${API_BASE}/admin/accounts`);
+    if (!res.ok) throw new Error('Could not load accounts');
+    return res.json();
+  },
+
+  async createAdminAccount(account) {
+    const res = await fetch(`${API_BASE}/admin/accounts`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(account)
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.message || 'Could not create account');
+    return data;
+  },
+
+  async deleteAdminAccount(id) {
+    const res = await fetch(`${API_BASE}/admin/accounts/${id}`, { method: 'DELETE' });
+    if (!res.ok) throw new Error('Could not delete account');
+  },
+
+  async sellerLogin(email, password) {
+    const res = await fetch(`${API_BASE}/seller-auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    if (!res.ok) {
+      const error = await res.json().catch(() => ({}));
+      throw new Error(error.message || 'Seller login failed');
+    }
+    return res.json();
+  },
+
+  async submitAccountApplication(application) {
+    const res = await fetch(`${API_BASE}/account-applications`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(application)
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.message || 'Could not submit application');
+    return data;
+  },
+
+  async getDeliveries(sellerId) {
+    const res = await fetch(`${API_BASE}/deliveries?sellerId=${encodeURIComponent(sellerId)}`);
+    if (!res.ok) throw new Error('Could not load deliveries');
+    return res.json();
+  },
+
+  async createDelivery(delivery) {
+    const res = await fetch(`${API_BASE}/deliveries`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(delivery)
+    });
+    if (!res.ok) throw new Error('Could not create delivery');
+    return res.json();
+  },
+
+  async updateDelivery(id, delivery) {
+    const res = await fetch(`${API_BASE}/deliveries/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(delivery)
+    });
+    if (!res.ok) throw new Error('Could not update delivery');
+    return res.json();
+  },
+
+  async deleteDelivery(id) {
+    const res = await fetch(`${API_BASE}/deliveries/${id}`, { method: 'DELETE' });
+    if (!res.ok) throw new Error('Could not delete delivery');
+  },
+
   async getCategories() {
     try {
       const res = await fetch(`${API_BASE}/categories`);

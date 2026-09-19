@@ -24,7 +24,7 @@ export const Router = {
     { pattern: /^#\/deals/, screen: DealsScreen },
     { pattern: /^#\/wishlist/, screen: WishlistScreen },
     { pattern: /^#\/seller\/\w+/, screen: SellerScreen },
-    { pattern: /^#\/account/, screen: AccountScreen }
+    { pattern: /^#\/account/, screen: AccountScreen },
   ],
 
   async handleRoute() {

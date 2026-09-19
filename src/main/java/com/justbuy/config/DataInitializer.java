@@ -20,6 +20,8 @@ public class DataInitializer implements CommandLineRunner {
     private final SellerRepository sellerRepo;
     private final ProductRepository productRepo;
     private final ReviewRepository reviewRepo;
+    private final AdminAccountRepository adminAccountRepo;
+    private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
 
     // Picsum Photos for product images (neutral, lifestyle-appropriate)
     private static final String IMG = "https://picsum.photos/seed/";
@@ -27,11 +29,24 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) {
         log.info("🌱 Seeding JustBuy database...");
+        seedAdminAccount();
         seedCategories();
         seedSellers();
         seedProducts();
         seedReviews();
         log.info("✅ Database seeded successfully!");
+    }
+
+    private void seedAdminAccount() {
+        if (adminAccountRepo.findByEmailIgnoreCase("admin@justbuy.com").isEmpty()) {
+            adminAccountRepo.save(AdminAccount.builder()
+                    .name("JustBuy Administrator")
+                    .email("admin@justbuy.com")
+                    .passwordHash(passwordEncoder.encode("admin123"))
+                    .role("ADMIN")
+                    .status("ACTIVE")
+                    .build());
+        }
     }
 
     private void seedCategories() {
@@ -50,7 +65,7 @@ public class DataInitializer implements CommandLineRunner {
 
     private void seedSellers() {
         List<Seller> sellers = List.of(
-            Seller.builder().name("TechNova Store").slug("technova").description("Premium electronics & gadgets curated for the modern lifestyle.").logoUrl(IMG+"technova/80/80").bannerUrl(IMG+"techbanner/1200/300").rating(4.8).reviewCount(12400).followerCount(98200).salesCount(245000).location("Shenzhen, China").verified(true).badge("Top Seller").build(),
+            Seller.builder().name("TechNova Store").email("seller@justbuy.com").passwordHash(passwordEncoder.encode("seller123")).slug("technova").description("Premium electronics & gadgets curated for the modern lifestyle.").logoUrl(IMG+"technova/80/80").bannerUrl(IMG+"techbanner/1200/300").rating(4.8).reviewCount(12400).followerCount(98200).salesCount(245000).location("Shenzhen, China").verified(true).badge("Top Seller").build(),
             Seller.builder().name("Linen & Lace").slug("linen-lace").description("Minimalist fashion for the mindful wardrobe.").logoUrl(IMG+"linen/80/80").bannerUrl(IMG+"fashionbanner/1200/300").rating(4.9).reviewCount(8700).followerCount(62000).salesCount(134000).location("Istanbul, Turkey").verified(true).badge("Top Seller").build(),
             Seller.builder().name("Casa Moderna").slug("casa-moderna").description("Scandinavian-inspired home décor & living essentials.").logoUrl(IMG+"casa/80/80").bannerUrl(IMG+"homebanner/1200/300").rating(4.7).reviewCount(5200).followerCount(41000).salesCount(89000).location("Copenhagen, Denmark").verified(true).badge("Rising Star").build(),
             Seller.builder().name("Glow Lab").slug("glow-lab").description("Clean beauty, natural skincare, dermatologist-tested formulas.").logoUrl(IMG+"glow/80/80").bannerUrl(IMG+"beautybanner/1200/300").rating(4.9).reviewCount(9800).followerCount(75000).salesCount(198000).location("Seoul, South Korea").verified(true).badge("Top Seller").build(),

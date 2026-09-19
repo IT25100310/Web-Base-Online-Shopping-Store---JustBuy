@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Delivery Dashboard - JustBuy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/delivery-dashboard.css">
+</head>
+<body>
+  <div class="driver-shell">
+    <aside class="driver-sidebar" id="driver-sidebar" aria-label="Driver navigation">
+      <div class="driver-brand"><span class="brand-mark">+</span><strong>Just<span>Buy</span></strong><em>Driver</em></div>
+      <div class="driver-profile"><div class="profile-avatar">AS</div><div><strong>Alex Silva</strong><small>Top rated driver</small></div></div>
+      <nav id="driver-nav" class="driver-nav">
+        <a href="#dashboard" data-route="dashboard" class="active"><span>▦</span>Dashboard</a>
+        <a href="#orders" data-route="orders"><span>□</span>Orders <b id="order-badge">0</b></a>
+        <a href="#delivery" data-route="delivery"><span>↗</span>Delivery</a>
+        <a href="#finance" data-route="finance"><span>$</span>Finance</a>
+        <a href="#settings" data-route="settings"><span>⚙</span>Settings</a>
+        <a href="#notifications" data-route="notifications"><span>!</span>Notifications <b id="notification-badge">0</b></a>
+      </nav>
+      <div class="sidebar-bottom"><label class="availability"><span>Available for work</span><button id="availability" class="toggle on" role="switch" aria-checked="true"><i></i></button></label><button id="logout" class="outline-button">Log out</button></div>
+    </aside>
+    <div id="backdrop" class="backdrop"></div>
+    <main class="driver-main">
+      <header class="driver-topbar">
+        <button id="menu" class="icon-button menu-button" aria-label="Open menu">☰</button>
+        <div><p class="topbar-kicker">DRIVER OPERATIONS</p><h1 id="route-title">Dashboard</h1><small id="today"></small></div>
+        <form id="global-search" class="top-search"><span>⌕</span><input id="global-query" type="search" placeholder="Search orders or tracking ID" aria-label="Search orders or tracking ID"></form>
+        <div class="top-actions"><button id="theme" class="icon-button" aria-label="Toggle theme">◐</button><button id="notifications" class="icon-button" aria-label="Open notifications">!<b id="top-notification-badge">0</b></button><button id="profile" class="profile-button">AS</button></div>
+      </header>
+      <div class="driver-content">
+        <section class="intro"><div><p class="eyebrow">DELIVERY CONTROL CENTER</p><h2 id="greeting">Good morning, Alex</h2><p id="subtitle">Here is your delivery progress for today.</p></div><button id="export" class="primary-button">Export earnings</button></section>
+        <section id="dashboard-view" class="view"></section>
+        <section id="orders-view" class="view" hidden></section>
+        <section id="delivery-view" class="view" hidden></section>
+        <section id="finance-view" class="view" hidden></section>
+        <section id="settings-view" class="view" hidden></section>
+        <section id="notifications-view" class="view" hidden></section>
+      </div>
+    </main>
+  </div>
+  <div id="toast-stack" class="toast-stack" aria-live="polite"></div>
+  <div id="modal-layer" class="modal-layer" hidden><div id="modal" class="modal" role="dialog" aria-modal="true"></div></div>
+  <script src="../js/delivery-dashboard.js" defer></script>
+</body>
+</html>

@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -18,6 +19,11 @@ public class OrderController {
     @PostMapping
     public ResponseEntity<Order> createOrder(@RequestBody Order order) {
         return ResponseEntity.ok(orderService.createOrder(order));
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, String>> handleInvalidOrder(IllegalArgumentException exception) {
+        return ResponseEntity.badRequest().body(Map.of("message", exception.getMessage()));
     }
 
     @GetMapping("/{id}")

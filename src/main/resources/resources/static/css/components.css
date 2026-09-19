@@ -1906,6 +1906,20 @@ body.dark-mode .coupon-right code { background: var(--dark-surface-2); color: va
 .address-preview strong { color: var(--text-dark); }
 .address-preview p { font-size: var(--text-sm); color: var(--text-neutral); margin-top: 6px; }
 .mt-3 { margin-top: var(--space-4); }
+.account-application-form { display: grid; gap: var(--space-3); margin-top: var(--space-5); }
+.account-application-form label { display: grid; gap: 6px; color: var(--text-neutral); font-size: var(--text-xs); font-weight: var(--fw-semi); }
+.account-application-form input, .account-application-form select, .account-application-form textarea { width: 100%; padding: 11px 13px; border: 1px solid var(--border-light); border-radius: var(--radius-md); background: var(--bg-secondary); color: var(--text-dark); outline: none; resize: vertical; }
+.account-application-form input:focus, .account-application-form select:focus, .account-application-form textarea:focus { border-color: var(--accent-orange); box-shadow: 0 0 0 3px rgba(242,107,29,.12); }
+.account-application-form [hidden] { display: none; }
+.account-application-form .btn:disabled { cursor: not-allowed; opacity: .6; }
+
+/* ═══════════ SELLER DASHBOARD ═══════════ */
+
+@media (max-width: 800px) {
+    .dashboard-header { align-items: flex-start; flex-direction: column; }
+    .delivery-address-field, .seller-account-card { grid-column: auto; }
+    .delivery-row { grid-template-columns: 1fr; }
+}
 
 /* ═══════════ QUICK CART DRAWER ═══════════ */
 .drawer-backdrop {
