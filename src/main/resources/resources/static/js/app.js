@@ -41,6 +41,11 @@ class JustBuyApp {
   }
 
   static setupNavbar() {
+    const role = Store.state.user?.role || 'customer';
+    const sellerDashboardLink = document.querySelector('.seller-dashboard-link');
+    if (sellerDashboardLink) {
+      sellerDashboardLink.hidden = role !== 'seller';
+    }
     const navbar = document.getElementById('navbar');
     window.addEventListener('scroll', () => {
       if (window.scrollY > 30) {

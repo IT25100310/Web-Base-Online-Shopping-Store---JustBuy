@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Review Center - JustBuy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/admin-dashboard.css">
+</head>
+<body>
+  <main class="admin-shell">
+    <header class="admin-header">
+      <a class="brand" href="/HTML/index.html#/">⚡ Just<span>Buy</span></a>
+      <div class="admin-header-actions"><span>JustBuy Administrator</span><button id="logout" class="button secondary">Log out</button></div>
+    </header>
+    <section class="admin-hero"><div><p class="eyebrow">ACCOUNT GOVERNANCE</p><h1>Applications review center</h1><p>Review and approve seller and delivery applications before account access is provisioned.</p></div><div class="admin-avatar">JA</div></section>
+    <section class="admin-toolbar"><div class="filter-tabs"><button class="filter active" data-status="PENDING">Applications</button><button class="filter" data-status="">All applications</button><button class="filter" data-view="accounts">Accounts</button></div><div><button id="create-account" class="button primary">Create account</button><button id="refresh" class="button secondary">Refresh</button></div></section>
+    <section id="summary" class="summary-grid"></section>
+    <section id="application-list" class="application-list"></section>
+  </main>
+  <div id="toast" class="toast" aria-live="polite"></div>
+  <script type="module" src="../js/admin-dashboard.js"></script>
+</body>
+</html>

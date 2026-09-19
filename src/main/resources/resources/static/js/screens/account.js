@@ -3,6 +3,7 @@
 // ============================================
 
 import { Store } from '../store.js';
+import { API } from '../api.js';
 
 export const AccountScreen = {
   render() {
@@ -12,6 +13,14 @@ export const AccountScreen = {
       avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
       address: 'No saved delivery address'
     };
+    const role = user.role || 'customer';
+    const isCustomer = role === 'customer';
+    const dashboardLink = role === 'seller'
+      ? '<a href="/HTML/seller-dashboard.html" class="btn btn-primary btn-liquid">Open Seller Dashboard</a>'
+      : role === 'driver'
+        ? '<a href="/HTML/delivery-dashboard.html" class="btn btn-primary btn-liquid">Open Delivery Dashboard</a>'
+        : '';
+    const applicationState = JSON.parse(localStorage.getItem('jb_account_application') || 'null');
 
     return `
       <div class="account-page">
@@ -78,14 +87,22 @@ export const AccountScreen = {
 
           <div class="account-card glass seller-account-card">
             <div class="card-heading-row">
-              <span class="heading-icon">🏪</span>
-              <h2>Seller account</h2>
+              <span class="heading-icon">${isCustomer ? '🪪' : role === 'seller' ? '🏪' : '🚚'}</span>
+              <h2>${isCustomer ? 'Become a JustBuy partner' : role === 'seller' ? 'Seller account' : 'Delivery account'}</h2>
             </div>
-            <p class="account-help">Manage deliveries and keep your storefront moving.</p>
-            <div class="account-actions">
-              <a href="#/seller-dashboard" class="btn btn-primary btn-liquid">Open Seller Dashboard</a>
-              <button id="logout-btn" class="btn btn-glass">Log out</button>
-            </div>
+            ${isCustomer ? `<p class="account-help">Apply to sell products or deliver orders. An administrator reviews every application before access is granted.</p>
+            <form id="account-application-form" class="account-application-form">
+              <label>Apply as<select id="application-role"><option value="SELLER">Seller</option><option value="DELIVERY">Delivery driver</option></select></label>
+              <label>Full name<input name="applicantName" value="${user.name || ''}" required></label>
+              <label>Email<input name="email" type="email" value="${user.email || ''}" required></label>
+              <label>Address<input name="address" required placeholder="Your full address"></label>
+              <label>ID number<input name="idNumber" minlength="5" required placeholder="Government ID number"></label>
+              <label>Phone number<input name="phoneNumber" required placeholder="+1 555 000 0000"></label>
+              <div id="seller-application-fields"><label>Payment method<input name="paymentMethod" placeholder="Bank account or payment details"></label><label>Seller details<textarea name="businessDetails" rows="3" placeholder="Tell us about your store and products"></textarea></label></div>
+              <div id="delivery-application-fields" hidden><label>Vehicle number<input name="vehicleNumber" placeholder="Vehicle registration number"></label></div>
+              <button class="btn btn-primary btn-liquid" type="submit">Submit application</button><p id="application-message" class="account-help" aria-live="polite">${applicationState?.status === 'PENDING' ? `Pending ${applicationState.requestedRole.toLowerCase()} application${applicationState.generatedSellerId ? ` · ${applicationState.generatedSellerId}` : ''}.` : ''}</p>
+            </form>` : `<p class="account-help">${role === 'seller' ? 'Manage your products, orders, and store earnings.' : 'Manage your assigned route and delivery earnings.'}</p><div class="account-actions">${dashboardLink}<button id="logout-btn" class="btn btn-glass">Log out</button></div>`}
+            ${isCustomer ? '<div class="account-actions"><button id="logout-btn" class="btn btn-glass">Log out</button></div>' : ''}
           </div>
 
           <!-- Saved Shipping Address -->
@@ -107,10 +124,38 @@ export const AccountScreen = {
   },
 
   afterRender() {
+    const applicationForm = document.getElementById('account-application-form');
+    const applicationRole = document.getElementById('application-role');
+    const applicationMessage = document.getElementById('application-message');
+    const updateApplicationFields = () => {
+      const sellerFields = document.getElementById('seller-application-fields');
+      const deliveryFields = document.getElementById('delivery-application-fields');
+      const seller = applicationRole.value === 'SELLER';
+      sellerFields.hidden = !seller;
+      deliveryFields.hidden = seller;
+      sellerFields.querySelectorAll('input,textarea').forEach(field => field.required = seller);
+      deliveryFields.querySelectorAll('input').forEach(field => field.required = !seller);
+    };
+    applicationRole?.addEventListener('change', updateApplicationFields);
+    updateApplicationFields();
+    applicationForm?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const formData = new FormData(applicationForm);
+      const application = Object.fromEntries(formData.entries());
+      application.requestedRole = applicationRole.value;
+      applicationMessage.textContent = 'Submitting application...';
+      try {
+        const saved = await API.submitAccountApplication(application);
+        localStorage.setItem('jb_account_application', JSON.stringify(saved));
+        applicationMessage.textContent = `Application submitted for admin review${saved.generatedSellerId ? ` · Seller ID: ${saved.generatedSellerId}` : ''}.`;
+        applicationForm.querySelector('button[type="submit"]').disabled = true;
+      } catch (error) {
+        applicationMessage.textContent = error.message;
+      }
+    });
     document.getElementById('logout-btn')?.addEventListener('click', () => {
       Store.logout();
-      window.location.hash = '#/';
-      Store.toast('You have been logged out.', 'info');
+      window.location.href = '/HTML/login.html';
     });
   }
 };

@@ -1,192 +1,251 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Seller Dashboard — JustBuy</title>
-<link rel="stylesheet" href="seller-dashboard.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Seller Dashboard — JustBuy</title>
+
+  <!-- Same font + design system as the storefront -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="../css/tokens.css" />
+  <link rel="stylesheet" href="../css/base.css" />
+  <link rel="stylesheet" href="../css/components.css" />
+  <link rel="stylesheet" href="../css/animations.css" />
+  <!-- Dashboard-only styles (load last) -->
+  <link rel="stylesheet" href="../css/seller-dashboard.css" />
 </head>
 <body>
 
-<div class="dash">
+  <!-- Animated WebGL background (same as storefront) -->
+  <canvas id="bg-shader-canvas"></canvas>
 
-  <!-- Sidebar -->
-  <aside class="sidebar">
-    <div class="brand">
-      <span class="brand-bolt">⚡</span>
-      <span class="brand-name">Just<span class="brand-accent">Buy</span></span>
-    </div>
+  <div class="sd-shell" id="sd-shell">
 
-    <div class="seller-card">
-      <img class="seller-avatar" src="https://i.pravatar.cc/64?img=12" alt="">
-      <div>
-        <p class="seller-name">Nova Studio</p>
-        <p class="seller-tier"><span class="dot"></span>Verified Seller</p>
+    <!-- ═══════════ LEFT SIDEBAR ═══════════ -->
+    <aside class="sd-sidebar glass-lg" id="sd-sidebar" aria-label="Seller navigation">
+      <div class="sd-sidebar-head">
+        <a href="index.html#/" class="nav-logo" aria-label="JustBuy home">
+          <span class="logo-mark">⚡</span>
+          <span class="logo-name">Just<span class="logo-accent">Buy</span></span>
+        </a>
+        <span class="sd-role-tag">Seller</span>
       </div>
-    </div>
 
-    <nav class="nav">
-      <a class="nav-link active" href="#overview">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 13h6V4H4v9Zm10 7h6V4h-6v16ZM4 20h6v-5H4v5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
-        Overview
-      </a>
-      <a class="nav-link" href="#products">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 7l9-4 9 4-9 4-9-4Zm0 0v10l9 4 9-4V7" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
-        Products
-      </a>
-      <a class="nav-link" href="#orders">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 7h12l-1 13H7L6 7Zm3 0V5a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
-        Orders
-        <span class="nav-badge">6</span>
-      </a>
-      <a class="nav-link" href="#payouts">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 6h18v12H3V6Zm0 4h18M7 15h4" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
-        Payouts
-      </a>
-      <a class="nav-link" href="#analytics">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 20V10m6 10V4m6 16v-7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-        Analytics
-      </a>
-      <a class="nav-link" href="#settings">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6"/><path d="M12 3v2m0 14v2m9-9h-2M5 12H3m14.5-6.5-1.4 1.4M6.9 17.1l-1.4 1.4m0-13 1.4 1.4M17.1 17.1l1.4 1.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-        Settings
-      </a>
-    </nav>
+      <div class="sd-store-card glass">
+        <img id="sd-store-logo" class="sd-store-logo" src="" alt="" />
+        <div class="sd-store-meta">
+          <strong id="sd-store-name">Your store</strong>
+          <span id="sd-store-sub">★ 4.8 · Top Seller</span>
+        </div>
+      </div>
 
-    <a class="storefront-link" href="#storefront">
-      View storefront
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M7 17 17 7M9 7h8v8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </a>
-  </aside>
+      <nav class="sd-nav" id="sd-nav" aria-label="Seller menu">
+        <!-- Rendered by seller-dashboard.js -->
+      </nav>
 
-  <!-- Main -->
-  <main class="main">
+      <div class="sd-sidebar-foot">
+        <div class="sd-vacation-row">
+          <span class="sd-vacation-label" id="sd-vacation-label">✈️ Vacation mode</span>
+          <button class="sd-switch" id="sd-vacation-switch" role="switch" aria-checked="false" aria-labelledby="sd-vacation-label">
+            <span class="sd-switch-knob"></span>
+          </button>
+        </div>
+        <a href="login.html" class="btn btn-glass btn-sm btn-block" id="sd-logout">🚪 Log out</a>
+      </div>
+    </aside>
+    <div class="sd-backdrop" id="sd-backdrop"></div>
 
-    <header class="topbar">
-      <div>
-        <h1>Overview</h1>
-        <p class="topbar-sub">Here's how Nova Studio is doing this week.</p>
-      </div>
-      <div class="topbar-actions">
-        <button class="range-toggle" data-range>
-          <button class="range-btn" data-range-btn="7d">7d</button>
-          <button class="range-btn active" data-range-btn="30d">30d</button>
-          <button class="range-btn" data-range-btn="90d">90d</button>
-        </button>
-        <button class="icon-btn" aria-label="Notifications">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 9a6 6 0 1 1 12 0c0 4 1.5 5.5 1.5 5.5H4.5S6 13 6 9Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M10 18a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="1.6"/></svg>
-          <span class="icon-dot"></span>
-        </button>
-        <button class="cta-pill">List a product</button>
-      </div>
-    </header>
+    <!-- ═══════════ MAIN ═══════════ -->
+    <div class="sd-main">
 
-    <!-- Stats -->
-    <section class="stats" id="overview">
-      <div class="stat-card">
-        <p class="stat-label">Revenue</p>
-        <p class="stat-value" data-value="18420">$0</p>
-        <p class="stat-delta up">+12.4% vs last period</p>
-      </div>
-      <div class="stat-card">
-        <p class="stat-label">Orders</p>
-        <p class="stat-value" data-value="342">0</p>
-        <p class="stat-delta up">+8.1% vs last period</p>
-      </div>
-      <div class="stat-card">
-        <p class="stat-label">Units sold</p>
-        <p class="stat-value" data-value="617">0</p>
-        <p class="stat-delta down">-2.3% vs last period</p>
-      </div>
-      <div class="stat-card">
-        <p class="stat-label">Buyer rating</p>
-        <p class="stat-value" data-value="4.9" data-decimal="1">0.0</p>
-        <p class="stat-delta up">+0.1 vs last period</p>
-      </div>
-    </section>
+      <header class="sd-topbar glass">
+        <button class="sd-icon-btn" id="sd-menu-btn" aria-label="Open menu" aria-controls="sd-sidebar" aria-expanded="false">☰</button>
 
-    <!-- Chart + Top products -->
-    <section class="grid-2">
-      <div class="panel chart-panel">
-        <div class="panel-head">
-          <h2>Revenue</h2>
-          <div class="legend">
-            <span><i class="swatch swatch-a"></i>This period</span>
-            <span><i class="swatch swatch-b"></i>Previous</span>
+        <div class="sd-topbar-title">
+          <h1 id="sd-greeting">Dashboard</h1>
+          <p id="sd-date"></p>
+        </div>
+
+        <form class="sd-search glass" id="sd-search-form" role="search">
+          <span aria-hidden="true">🔍</span>
+          <input type="search" id="sd-search-input" placeholder="Search orders, products, customers" aria-label="Search orders, products, customers" autocomplete="off" />
+        </form>
+
+        <div class="sd-topbar-actions">
+          <a href="#/products-add" class="btn btn-primary btn-sm btn-liquid">+ Add product</a>
+          <button class="sd-icon-btn glass" id="sd-theme-btn" aria-label="Toggle dark mode">🌙</button>
+          <button class="sd-icon-btn glass" id="sd-bell-btn" aria-label="Go to notifications">
+            <span aria-hidden="true">🔔</span>
+            <span class="counter-badge" id="sd-bell-count" style="display:none">0</span>
+          </button>
+          <a href="#/settings-profile" class="sd-user" aria-label="Your profile">
+            <img id="sd-user-avatar" src="" alt="" />
+          </a>
+        </div>
+      </header>
+
+      <div class="sd-content" id="sd-view-dashboard">
+
+        <div class="sd-banner glass" id="sd-vacation-banner" hidden>
+          <span>✈️ Vacation mode is on. Customers see your store as temporarily unavailable.</span>
+          <button class="btn btn-glass btn-sm" id="sd-vacation-off">Turn off</button>
+        </div>
+
+        <!-- ── Summary cards ── -->
+        <section aria-labelledby="sd-h-overview">
+          <h2 class="sd-sr-only" id="sd-h-overview">Overview</h2>
+          <div class="sd-stats" id="sd-stats"></div>
+        </section>
+
+        <!-- ── Today / to-do metrics ── -->
+        <section aria-labelledby="sd-h-glance">
+          <div class="sd-section-head">
+            <h2 id="sd-h-glance">At a glance</h2>
+            <p>What needs your attention right now.</p>
           </div>
-        </div>
-        <canvas id="revenueChart" height="220"></canvas>
+          <div class="sd-metrics" id="sd-metrics"></div>
+        </section>
+
+        <!-- ── Sales analytics ── -->
+        <section class="sd-analytics" id="sd-analytics" aria-labelledby="sd-h-analytics">
+          <div class="sd-section-head sd-section-head-row">
+            <div>
+              <h2 id="sd-h-analytics">Sales analytics</h2>
+              <p id="sd-period-caption">Last 14 days</p>
+            </div>
+            <div class="sd-seg glass" id="sd-period-tabs" role="tablist" aria-label="Chart period">
+              <button role="tab" class="active" data-period="day" aria-selected="true">By day</button>
+              <button role="tab" data-period="week" aria-selected="false">By week</button>
+              <button role="tab" data-period="month" aria-selected="false">By month</button>
+            </div>
+          </div>
+
+          <div class="sd-row sd-row-2-1">
+            <article class="sd-card glass">
+              <div class="sd-card-head">
+                <div>
+                  <h3>Sales</h3>
+                  <p id="sd-sales-total"></p>
+                </div>
+              </div>
+              <div class="sd-chart" id="sd-chart-sales"></div>
+            </article>
+
+            <article class="sd-card glass">
+              <div class="sd-card-head">
+                <div>
+                  <h3>Sales by category</h3>
+                  <p>Last 12 months</p>
+                </div>
+              </div>
+              <div id="sd-donut"></div>
+            </article>
+          </div>
+
+          <div class="sd-row sd-row-3">
+            <article class="sd-card glass">
+              <div class="sd-card-head">
+                <div>
+                  <h3>Orders over time</h3>
+                  <p id="sd-orders-total"></p>
+                </div>
+              </div>
+              <div class="sd-chart" id="sd-chart-orders"></div>
+            </article>
+
+            <article class="sd-card glass">
+              <div class="sd-card-head">
+                <div>
+                  <h3>Revenue over time</h3>
+                  <p id="sd-revenue-total"></p>
+                </div>
+              </div>
+              <div class="sd-chart" id="sd-chart-revenue"></div>
+            </article>
+
+            <article class="sd-card glass">
+              <div class="sd-card-head">
+                <div>
+                  <h3>Top-selling products</h3>
+                  <p>Last 12 months</p>
+                </div>
+              </div>
+              <ol class="sd-top-list" id="sd-top-products"></ol>
+            </article>
+          </div>
+        </section>
+
+        <!-- ── Recent activity ── -->
+        <section aria-labelledby="sd-h-activity">
+          <div class="sd-section-head">
+            <h2 id="sd-h-activity">Recent activity</h2>
+            <p>Latest orders, messages, reviews and alerts.</p>
+          </div>
+
+          <div class="sd-row sd-row-2-1">
+            <article class="sd-card glass">
+              <div class="sd-card-head">
+                <h3>Recent orders</h3>
+                <a href="#/sales-orders" class="sd-link">View all orders</a>
+              </div>
+              <div class="sd-table-wrap" id="sd-recent-orders"></div>
+            </article>
+
+            <article class="sd-card glass">
+              <div class="sd-card-head">
+                <h3>Low stock alerts</h3>
+                <a href="#/products-inventory" class="sd-link">Open inventory</a>
+              </div>
+              <ul class="sd-stock-list" id="sd-low-stock"></ul>
+            </article>
+          </div>
+
+          <div class="sd-row sd-row-3">
+            <article class="sd-card glass">
+              <div class="sd-card-head">
+                <h3>Recent messages</h3>
+                <a href="#/messages" class="sd-link">Open inbox</a>
+              </div>
+              <ul class="sd-feed" id="sd-messages"></ul>
+            </article>
+
+            <article class="sd-card glass">
+              <div class="sd-card-head">
+                <h3>Recent reviews</h3>
+                <a href="#/store-reviews" class="sd-link">All reviews</a>
+              </div>
+              <ul class="sd-feed" id="sd-reviews"></ul>
+            </article>
+
+            <article class="sd-card glass" id="sd-notifications-card">
+              <div class="sd-card-head">
+                <h3>Recent notifications</h3>
+                <button class="sd-link" id="sd-mark-read">Mark all read</button>
+              </div>
+              <ul class="sd-feed" id="sd-notifications"></ul>
+            </article>
+          </div>
+        </section>
+
       </div>
 
-      <div class="panel" id="products">
-        <div class="panel-head">
-          <h2>Top products</h2>
-          <a class="panel-link" href="#products">Manage all</a>
-        </div>
-        <ul class="product-list">
-          <li>
-            <div class="product-swatch swatch-orange"></div>
-            <div class="product-info">
-              <p class="product-name">Spatial Audio Pro</p>
-              <p class="product-meta">40mm Bio-Cellulose · 214 sold</p>
-            </div>
-            <p class="product-amount">$6,180</p>
-          </li>
-          <li>
-            <div class="product-swatch swatch-copper"></div>
-            <div class="product-info">
-              <p class="product-name">Liquid Precision Mouse</p>
-              <p class="product-meta">Aluminum shell · 168 sold</p>
-            </div>
-            <p class="product-amount">$4,920</p>
-          </li>
-          <li>
-            <div class="product-swatch swatch-slate"></div>
-            <div class="product-info">
-              <p class="product-name">Orbit Desk Mat</p>
-              <p class="product-meta">Woven fiber · 141 sold</p>
-            </div>
-            <p class="product-amount">$2,340</p>
-          </li>
-          <li>
-            <div class="product-swatch swatch-amber"></div>
-            <div class="product-info">
-              <p class="product-name">Studio Stand Mk II</p>
-              <p class="product-meta">Anodized steel · 94 sold</p>
-            </div>
-            <p class="product-amount">$1,880</p>
-          </li>
-        </ul>
-      </div>
-    </section>
+      <!-- Router outlet: every non-Dashboard menu item renders here -->
+      <div class="sd-content" id="sd-view-page" hidden></div>
 
-    <!-- Orders -->
-    <section class="panel" id="orders">
-      <div class="panel-head">
-        <h2>Recent orders</h2>
-        <a class="panel-link" href="#orders">View all orders</a>
-      </div>
-      <div class="table-wrap">
-        <table class="orders-table">
-          <thead>
-            <tr>
-              <th>Order</th>
-              <th>Buyer</th>
-              <th>Item</th>
-              <th>Total</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody id="ordersBody">
-            <!-- rows injected by JS -->
-          </tbody>
-        </table>
-      </div>
-    </section>
+    </div>
 
-  </main>
-</div>
+    <div id="toast-container" class="toast-stack"></div>
+    <div class="sd-tooltip" id="sd-tooltip" role="status" aria-live="polite"></div>
 
-<script src="seller-dashboard.js"></script>
+    <!-- Modal (product forms, confirmations, order/return details, etc.) -->
+    <div class="sd-modal-overlay" id="sd-modal-overlay" hidden>
+      <div class="sd-modal glass-lg" id="sd-modal-root" role="dialog" aria-modal="true"></div>
+    </div>
+  </div>
+
+  <script type="module" src="../js/seller-dashboard.js"></script>
 </body>
 </html>
