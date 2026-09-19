@@ -20,6 +20,11 @@ public class Seller {
     @Column(nullable = false)
     private String name;
 
+    @Column(unique = true)
+    private String email;
+
+    private String passwordHash;
+
     private String slug;
     private String description;
     private String logoUrl;
