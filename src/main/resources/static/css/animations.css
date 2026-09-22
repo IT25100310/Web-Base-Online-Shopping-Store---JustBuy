@@ -1,0 +1,128 @@
+/* ============================================
+   JustBuy — Animations & Micro-Interactions
+   ============================================ */
+
+/* ── Page Transition ── */
+@keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeSlideOut {
+    from { opacity: 1; transform: translateY(0); }
+    to   { opacity: 0; transform: translateY(-8px); }
+}
+
+/* ── Shimmer / Skeleton Loading ── */
+@keyframes shimmer {
+    0%   { background-position: -800px 0; }
+    100% { background-position: 800px 0; }
+}
+
+.skeleton {
+    background: linear-gradient(90deg,
+    var(--bg-secondary) 25%,
+    rgba(242,107,29,0.08) 37%,
+    var(--bg-secondary) 63%
+    );
+    background-size: 800px 100%;
+    animation: shimmer 1.6s ease infinite;
+    border-radius: var(--radius-md);
+}
+
+/* ── Blob Float ── */
+@keyframes blobFloat {
+    0%   { transform: translate(0, 0) scale(1) rotate(0deg); }
+    33%  { transform: translate(20px, -15px) scale(1.04) rotate(2deg); }
+    66%  { transform: translate(-12px, 10px) scale(0.97) rotate(-1deg); }
+    100% { transform: translate(0, 0) scale(1) rotate(0deg); }
+}
+
+@keyframes blobFloat2 {
+    0%   { transform: translate(0, 0) scale(1) rotate(0deg); }
+    40%  { transform: translate(-18px, 12px) scale(1.03) rotate(-2deg); }
+    70%  { transform: translate(14px, -8px) scale(0.98) rotate(1deg); }
+    100% { transform: translate(0, 0) scale(1) rotate(0deg); }
+}
+
+/* ── Glow Pulse ── */
+@keyframes glowPulse {
+    0%, 100% { box-shadow: var(--shadow-glow); }
+    50%       { box-shadow: var(--shadow-glow-lg), 0 4px 20px rgba(242,107,29,0.2); }
+}
+
+/* ── Badge Bounce ── */
+@keyframes badgePop {
+    0%   { transform: scale(0) rotate(-15deg); opacity: 0; }
+    60%  { transform: scale(1.3) rotate(4deg); opacity: 1; }
+    80%  { transform: scale(0.9) rotate(-2deg); }
+    100% { transform: scale(1) rotate(0deg); }
+}
+
+/* ── Success Check ── */
+@keyframes checkDraw {
+    0%   { stroke-dashoffset: 200; }
+    100% { stroke-dashoffset: 0; }
+}
+
+@keyframes circleDraw {
+    0%   { stroke-dashoffset: 283; opacity: 0; }
+    10%  { opacity: 1; }
+    100% { stroke-dashoffset: 0; opacity: 1; }
+}
+
+/* ── Hover Lift ── */
+@keyframes liftIn {
+    from { transform: translateY(0); box-shadow: var(--shadow-sm); }
+    to   { transform: translateY(-8px); box-shadow: var(--shadow-xl); }
+}
+
+/* ── Number Count ── */
+@keyframes countUp {
+    from { transform: translateY(8px); opacity: 0; }
+    to   { transform: translateY(0); opacity: 1; }
+}
+
+/* ── Spin ── */
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ── Stagger children ── */
+@keyframes staggerFade {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Toast slide ── */
+@keyframes toastSlideIn {
+    from { transform: translateX(120%); opacity: 0; }
+    to   { transform: translateX(0); opacity: 1; }
+}
+@keyframes toastSlideOut {
+    from { transform: translateX(0); opacity: 1; }
+    to   { transform: translateX(120%); opacity: 0; }
+}
+
+/* ── Cart Badge ── */
+@keyframes cartBadgeBounce {
+    0%   { transform: scale(1); }
+    30%  { transform: scale(1.5) rotate(-10deg); }
+    60%  { transform: scale(0.9) rotate(5deg); }
+    100% { transform: scale(1) rotate(0); }
+}
+
+/* ── Utility Classes ── */
+.animate-fade-in { animation: fadeSlideIn var(--dur-slow) var(--ease-out) both; }
+.animate-fade-in-delay-1 { animation: fadeSlideIn var(--dur-slow) var(--ease-out) 100ms both; }
+.animate-fade-in-delay-2 { animation: fadeSlideIn var(--dur-slow) var(--ease-out) 200ms both; }
+.animate-fade-in-delay-3 { animation: fadeSlideIn var(--dur-slow) var(--ease-out) 320ms both; }
+.animate-fade-in-delay-4 { animation: fadeSlideIn var(--dur-slow) var(--ease-out) 440ms both; }
+
+.page-enter { animation: fadeSlideIn 320ms var(--ease-out) both; }
+
+/* ── Auth Orb Sheen (moving glare highlight) ── */
+@keyframes orbSheen {
+    0%, 100% { transform: translate(0, 0) scale(1);   opacity: 0.8; }
+    50%      { transform: translate(7%, -7%) scale(1.15); opacity: 1; }
+}

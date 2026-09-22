@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign In — JustBuy</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../css/tokens.css" />
+    <link rel="stylesheet" href="../css/base.css" />
+    <link rel="stylesheet" href="../css/components.css" />
+    <link rel="stylesheet" href="../css/animations.css" />
+    <style>
+        .auth-page{position:relative;overflow:hidden;background:radial-gradient(circle at 15% 20%,rgba(242,107,29,.12),transparent 28%),radial-gradient(circle at 85% 85%,rgba(194,83,45,.1),transparent 30%)}
+        .auth-card{grid-template-columns:.9fr 1.1fr;max-width:980px;background:var(--glass-bg);border-color:var(--glass-border);backdrop-filter:blur(var(--glass-blur-lg));-webkit-backdrop-filter:blur(var(--glass-blur-lg))}
+        .auth-visual{display:flex;flex-direction:column;justify-content:space-between;min-height:560px;padding:42px 38px;background:linear-gradient(150deg,rgba(242,107,29,.98),rgba(194,83,45,.95));}
+        .auth-visual .nav-logo{color:#fff}.auth-visual .logo-accent{color:#ffe1c7}.auth-visual h1{max-width:270px;margin:0 0 14px;color:#fff7ee;font-size:38px;line-height:1.05;letter-spacing:-.04em}.auth-visual p{max-width:270px;color:rgba(255,247,238,.82);font-size:13px;line-height:1.7}.auth-visual-footer{display:grid;gap:12px}.auth-proof{display:flex;align-items:center;gap:10px;color:#fff7ee;font-size:11px}.auth-proof i{display:grid;place-items:center;width:26px;height:26px;border:1px solid rgba(255,255,255,.35);border-radius:9px;background:rgba(255,255,255,.15);font-style:normal}.auth-form-panel{padding:40px 42px}.auth-role-picker{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:24px 0 25px}.auth-role{display:grid;gap:3px;padding:11px 7px;border:1px solid var(--border-light);border-radius:12px;background:rgba(255,255,255,.24);color:var(--text-dark);cursor:pointer;text-align:center;transition:transform var(--dur-base),border-color var(--dur-base),background var(--dur-base)}.auth-role:hover,.auth-role.active{border-color:var(--accent-orange);background:rgba(242,107,29,.12);transform:translateY(-1px)}.auth-role span{font-size:17px}.auth-role strong{font-size:11px}.auth-role small{color:var(--text-neutral);font-size:9px;line-height:1.2}.auth-field{display:flex;flex-direction:column;gap:6px}.auth-field>span{font-size:var(--text-xs);font-weight:var(--fw-semi);color:var(--text-neutral)}.auth-field input{width:100%}.auth-form .auth-demo{margin-top:3px}.auth-form h2{font-size:26px;letter-spacing:-.03em}.auth-form .auth-sub{margin-top:-9px;color:var(--text-neutral);font-size:12px}
+        body.dark-mode .auth-visual{background:linear-gradient(150deg,#b8491c,#873b28)}
+        @media(max-width:780px){.auth-card{grid-template-columns:1fr;max-width:460px}.auth-visual{min-height:230px;padding:28px 26px}.auth-visual h1{font-size:29px}.auth-visual p{max-width:330px}.auth-visual-footer{display:none}.auth-form-panel{padding:30px 26px}}
+        @media(max-width:480px){.auth-role-picker{gap:5px}.auth-role{padding:10px 4px}.auth-role small{font-size:8px}}
+    </style>
+</head>
+<body>
+<canvas id="bg-shader-canvas"></canvas>
+
+<nav id="navbar" class="glass">
+    <div class="nav-inner">
+        <a href="index.html#/" class="nav-logo">
+            <span class="logo-mark">⚡</span>
+            <span class="logo-name">Just<span class="logo-accent">Buy</span></span>
+        </a>
+    </div>
+</nav>
+
+<main class="auth-page">
+    <div class="auth-card glass-lg">
+        <section class="auth-visual" aria-label="JustBuy marketplace">
+            <a href="/HTML/index.html#/" class="nav-logo"><span class="logo-mark">⚡</span><span class="logo-name">Just<span class="logo-accent">Buy</span></span></a>
+            <div><p class="eyebrow" style="color:#ffe1c7">THE 2026 MARKETPLACE</p><h1>Buy with intent. Deliver with confidence.</h1><p>One calm workspace for shoppers, sellers, and the people who keep every order moving.</p></div>
+            <div class="auth-visual-footer"><div class="auth-proof"><i>✓</i><span>Verified marketplace accounts</span></div><div class="auth-proof"><i>↗</i><span>Real-time order visibility</span></div></div>
+        </section>
+        <section class="auth-form-panel">
+            <div class="auth-tabs"><button class="auth-tab active" data-tab="signin">Sign In</button><button class="auth-tab" data-tab="signup">Create Account</button></div>
+            <div class="auth-role-picker" role="group" aria-label="Choose account type"><button class="auth-role active" type="button" data-role="customer"><span>🛍️</span><strong>Customer</strong><small>Shop and track orders</small></button><button class="auth-role" type="button" data-role="seller"><span>🏪</span><strong>Seller</strong><small>Manage your store</small></button><button class="auth-role" type="button" data-role="driver"><span>🚚</span><strong>Delivery</strong><small>Manage your route</small></button><button class="auth-role" type="button" data-role="admin"><span>🛡️</span><strong>Admin</strong><small>Review applications</small></button></div>
+            <form class="auth-form" id="auth-form">
+                <h2>Welcome back</h2><p class="auth-sub" id="auth-sub">Access your orders, wishlist and escrow wallet.</p>
+                <label class="auth-field" id="name-field" style="display:none"><span>Full name</span><input type="text" id="auth-name" placeholder="Alexander Wright" /></label>
+                <label class="auth-field"><span>Email address</span><input type="email" id="auth-email" placeholder="alex.wright@justbuy.design" required /></label>
+                <label class="auth-field"><span>Password</span><input type="password" id="auth-pass" placeholder="Enter your password" required /></label>
+                <div class="auth-row" id="auth-extra-row"><label class="auth-check"><input type="checkbox" checked /> Remember me</label><a class="auth-link" href="#" onclick="return false">Forgot password?</a></div>
+                <button type="submit" class="btn btn-primary btn-liquid btn-block" id="auth-submit">Sign In →</button><div class="auth-error" id="auth-error"></div><div class="auth-demo glass">Customer demo: any valid email and password works.</div>
+            </form>
+        </section>
+    </div>
+</main>
+
+<script type="module">
+    import { Store } from '../js/store.js';
+    import { ShaderGradient } from '../js/shader-gradient.js';
+    import { API } from '../js/api.js';
+    Store.initTheme();
+    try { new ShaderGradient('bg-shader-canvas'); } catch(e) {}
+
+    let mode = 'signin';
+    let role = 'customer';
+    const tabs = document.querySelectorAll('.auth-tab');
+    const roles = document.querySelectorAll('.auth-role');
+    const nameField = document.getElementById('name-field');
+    const sub = document.getElementById('auth-sub');
+    const submit = document.getElementById('auth-submit');
+    const err = document.getElementById('auth-error');
+
+    const roleCopy = {
+        customer: 'Access your orders, wishlist and escrow wallet.',
+        seller: 'Manage products, orders, deliveries, and store earnings.',
+        driver: 'View your route, current deliveries, and driver earnings.',
+        admin: 'Review seller and delivery account applications.'
+    };
+
+    function updateRole(nextRole) {
+        role = nextRole;
+        roles.forEach(button => button.classList.toggle('active', button.dataset.role === role));
+        sub.textContent = mode === 'signup' ? 'Join 2M+ members of the 2026 marketplace.' : roleCopy[role];
+        err.textContent = '';
+    }
+
+    roles.forEach(button => button.addEventListener('click', () => updateRole(button.dataset.role)));
+
+    tabs.forEach(t => t.addEventListener('click', () => {
+        tabs.forEach(x => x.classList.remove('active'));
+        t.classList.add('active');
+        mode = t.dataset.tab;
+        const signup = mode === 'signup';
+        nameField.style.display = signup ? 'block' : 'none';
+        sub.textContent = signup ? 'Join 2M+ members of the 2026 marketplace.' : roleCopy[role];
+        submit.textContent = signup ? 'Create Account →' : 'Sign In →';
+        err.textContent = '';
+    }));
+
+    document.getElementById('auth-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('auth-email').value.trim();
+        const pass = document.getElementById('auth-pass').value;
+        if (!email.includes('@') || pass.length < 4) {
+            err.textContent = 'Enter a valid email and a password of 4+ characters.';
+            return;
+        }
+        if (mode === 'signup' && role !== 'customer') {
+            err.textContent = 'Staff and admin accounts are created by JustBuy administrators.';
+            return;
+        }
+        const name = document.getElementById('auth-name').value.trim() || 'Alexander Wright';
+
+        // Admin sign-in now always defers to the real backend — no hardcoded
+        // demo password here. AdminAuthController + BCrypt decide pass/fail.
+        if (mode === 'signin' && role === 'admin') {
+            try {
+                const result = await API.adminLogin(email, pass);
+                Store.state.user = result.admin;
+                localStorage.setItem('jb_user', JSON.stringify(result.admin));
+                window.location.href = '/HTML/admin-dashboard.html';
+            } catch (error) {
+                err.textContent = error.message || 'Admin login failed.';
+            }
+            return;
+        }
+        if (mode === 'signin' && role === 'seller') {
+            try {
+                const result = await API.sellerLogin(email, pass);
+                Store.state.seller = result.seller;
+                localStorage.setItem('jb_seller', JSON.stringify(result.seller));
+                Store.state.user = { ...Store.state.user, id: result.seller.id, name: result.seller.name || 'Seller', fullName: result.seller.name || 'Seller', email: result.seller.email || email, address: result.seller.location || '', role: 'seller' };
+                localStorage.setItem('jb_user', JSON.stringify(Store.state.user));
+                window.location.href = 'seller-dashboard.html';
+            } catch (error) {
+                err.textContent = error.message || 'Seller login failed.';
+            }
+            return;
+        }
+        if (mode === 'signup' && role === 'customer') {
+            try {
+                const result = await API.customerRegister(name, email, pass);
+                const customer = {
+                    id: result.id,
+                    name: result.fullName,
+                    fullName: result.fullName,
+                    email: result.email,
+                    role: 'customer'
+                };
+                Store.state.user = customer;
+                localStorage.setItem('jb_user', JSON.stringify(customer));
+                Store.toast('Account created successfully!', 'success');
+                setTimeout(() => {
+                    window.location.href = 'index.html#/';
+                }, 500);
+            } catch (error) {
+                err.textContent = error.message || 'Customer registration failed.';
+            }
+            return;
+        }
+
+        if (mode === 'signin' && role === 'customer') {
+            try {
+                const result = await API.customerLogin(email, pass);
+                const customer = {
+                    id: result.id,
+                    name: result.fullName,
+                    fullName: result.fullName,
+                    email: result.email,
+                    role: 'customer'
+                };
+                Store.state.user = customer;
+                localStorage.setItem('jb_user', JSON.stringify(customer));
+                Store.toast(`Welcome, ${result.fullName.split(' ')[0]}!`, 'success');
+                setTimeout(() => {
+                    window.location.href = 'index.html#/';
+                }, 500);
+            } catch (error) {
+                err.textContent = error.message || 'Customer login failed.';
+            }
+            return;
+        }
+
+        if (mode === 'signin' && role === 'driver') {
+            try {
+                const result = await API.driverLogin(email, pass);
+                const driver = result.driver;
+                const driverSession = {
+                    id: driver.id,
+                    name: driver.name,
+                    email: driver.email,
+                    phoneNumber: driver.phoneNumber,
+                    vehicleNumber: driver.vehicleNumber,
+                    role: 'driver'
+                };
+                Store.state.user = driverSession;
+                localStorage.setItem('jb_user', JSON.stringify(driverSession));
+                localStorage.setItem('jb_driver', JSON.stringify(driver));
+                Store.toast(`Welcome, ${driver.name.split(' ')[0]}!`, 'success');
+                setTimeout(() => {
+                    window.location.href = 'delivery-dashboard.html';
+                }, 500);
+            } catch (error) {
+                err.textContent = error.message || 'Driver login failed.';
+            }
+            return;
+        }
+
+        err.textContent = 'Please choose a valid account type.';
+    });
+</script>
+</body>
+</html>

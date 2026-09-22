@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="JustBuy — Next-Gen 2026 E-Commerce Marketplace with liquid-glass design, 3D hardware inspection, and verified artisan flagships." />
+  <meta name="keywords" content="marketplace, electronics, gadgets, audio, 3D e-commerce, design hardware" />
+  <title>JustBuy — Liquid Precision Marketplace</title>
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <!-- CSS Design System -->
+  <link rel="stylesheet" href="../css/tokens.css" />
+  <link rel="stylesheet" href="../css/base.css" />
+  <link rel="stylesheet" href="../css/components.css" />
+  <link rel="stylesheet" href="../css/animations.css" />
+
+  <!-- External 3D & Animation Engines -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+</head>
+<body>
+
+  <!-- Fullscreen WebGL Animated Shader Canvas (shadergradient inspiration) -->
+  <canvas id="bg-shader-canvas"></canvas>
+
+  <!-- ═════════════════════════════════════════════════
+       NAVBAR (Glassmorphic Sticky Top Navigation)
+       ═════════════════════════════════════════════════ -->
+  <nav id="navbar" class="glass">
+    <div class="nav-inner">
+      <!-- Brand Logo -->
+      <a href="#/" class="nav-logo">
+        <span class="logo-mark">⚡</span>
+        <span class="logo-name">Just<span class="logo-accent">Buy</span></span>
+      </a>
+
+      <!-- Search Bar with Live Suggestions -->
+      <div class="nav-search">
+        <form id="global-search-form" class="search-bar glass" action="#/products" method="GET">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="global-search-input" class="search-input" placeholder="Search curated artifacts, designers, audio, gear..." autocomplete="off" />
+          <span class="search-shortcut">⌘K</span>
+        </form>
+        <!-- Dynamic autocomplete suggestions dropdown -->
+        <div id="search-suggestions" class="search-dropdown glass-lg" style="display: none;"></div>
+      </div>
+
+      <!-- Navigation Links -->
+      <div class="nav-links">
+        <a href="#/products" class="nav-link">Marketplace</a>
+        <a href="#/deals" class="nav-link">
+          <span class="nav-hot-dot"></span> Flash Deals
+        </a>
+        <a href="#/seller/1" class="nav-link">Flagships</a>
+        <a href="/HTML/seller-dashboard.html" class="nav-link seller-dashboard-link">Seller Dashboard</a>
+      </div>
+
+      <!-- Utility Cluster (Currency, Theme, Wishlist, Cart, Profile) -->
+      <div class="nav-actions">
+        <!-- Currency Selector -->
+        <select id="currency-selector" class="currency-picker glass" title="Change Currency">
+          <option value="USD">USD ($)</option>
+          <option value="EUR">EUR (€)</option>
+          <option value="GBP">GBP (£)</option>
+          <option value="JPY">JPY (¥)</option>
+        </select>
+
+        <!-- Dark/Light Mode Switcher -->
+        <button id="theme-toggle-btn" class="nav-icon-btn glass" title="Toggle Theme">
+          🌙
+        </button>
+
+        <!-- Wishlist Link -->
+        <a href="#/wishlist" class="nav-icon-btn glass" title="Wishlist">
+          <span>🤍</span>
+          <span id="nav-wish-count" class="counter-badge" style="display: none;">0</span>
+        </a>
+
+        <!-- Quick Cart Drawer Trigger -->
+        <button id="nav-cart-btn" class="cart-pill-btn btn-liquid" title="Open Cart">
+          <span>🛒</span>
+          <span class="cart-label">Bag</span>
+          <span id="nav-cart-count" class="cart-badge-pill" style="display: none;">0</span>
+        </button>
+
+        <!-- User Profile Avatar Link -->
+        <a href="#/account" class="nav-profile-link" title="My Account">
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&auto=format&fit=crop&q=80" alt="User" class="nav-avatar" />
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ═════════════════════════════════════════════════
+       MAIN APPLICATION VIEW CONTAINER
+       ═════════════════════════════════════════════════ -->
+  <main id="app" class="app-root">
+    <!-- Screen components are rendered here dynamically by router.js -->
+    <div class="initial-loader">
+      <div class="spinner"></div>
+      <p>Initializing JustBuy 2026 Engine...</p>
+    </div>
+  </main>
+
+  <!-- ═════════════════════════════════════════════════
+       SLIDE-OVER QUICK CART DRAWER
+       ═════════════════════════════════════════════════ -->
+  <div id="drawer-backdrop" class="drawer-backdrop"></div>
+  <aside id="quick-cart-drawer" class="quick-cart-drawer glass-lg">
+    <div class="drawer-header">
+      <div class="drawer-title-row">
+        <span>🛒</span>
+        <h2>Your Bag</h2>
+      </div>
+      <button id="close-drawer-btn" class="drawer-close-btn">✕</button>
+    </div>
+
+    <!-- Scrollable Items Container -->
+    <div id="drawer-items-container" class="drawer-body">
+      <!-- Injected via JavaScript -->
+    </div>
+
+    <!-- Drawer Footer Summary & Checkout CTA -->
+    <div class="drawer-footer glass">
+      <div class="drawer-subtotal-row">
+        <span>Subtotal:</span>
+        <strong id="drawer-subtotal">$0.00</strong>
+      </div>
+      <p class="drawer-shipping-hint">Taxes and free priority delivery calculated at checkout.</p>
+      <div class="drawer-actions">
+        <a href="#/cart" class="btn btn-glass btn-block" onclick="document.getElementById('drawer-backdrop').click()">
+          View Full Bag
+        </a>
+        <a href="#/checkout" class="btn btn-primary btn-liquid btn-block" onclick="document.getElementById('drawer-backdrop').click()">
+          Instant Checkout →
+        </a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═════════════════════════════════════════════════
+       LIVE ARTISAN / AI CHAT ASSISTANT
+       ═════════════════════════════════════════════════ -->
+  <button id="chat-fab" class="chat-floating-fab glass-lg" title="Artisan Concierge">
+    <span class="fab-icon">💬</span>
+    <span class="fab-ping"></span>
+  </button>
+
+  <div id="chat-widget" class="chat-widget-box glass-lg">
+    <div class="chat-widget-header">
+      <div class="chat-header-info">
+        <span class="chat-pulse"></span>
+        <div>
+          <h4>JustBuy AI & Artisan Support</h4>
+          <span>Instant reply • 24/7 Verified</span>
+        </div>
+      </div>
+      <button id="chat-close-btn" class="chat-close">✕</button>
+    </div>
+
+    <div id="chat-messages" class="chat-messages-body">
+      <div class="chat-bubble bot glass">
+        Welcome to JustBuy! I can help you find hardware specifications, verify seller certifications, or track existing dispatches. What are you looking for today?
+      </div>
+    </div>
+
+    <div class="chat-input-bar glass">
+      <input type="text" id="chat-input" placeholder="Type a message or question..." />
+      <button id="chat-send-btn" class="chat-send">➤</button>
+    </div>
+  </div>
+
+  <!-- Toast Notification Stack -->
+  <div id="toast-container" class="toast-stack"></div>
+
+  <!-- ═════════════════════════════════════════════════
+       GLOBAL FOOTER (Modern 2026 Marketplace Design)
+       ═════════════════════════════════════════════════ -->
+  <footer class="footer-root glass">
+    <div class="footer-top max-width-wrap">
+      <div class="footer-brand-col">
+        <a href="#/" class="footer-logo">
+          <span>⚡ Just<span class="logo-accent">Buy</span></span>
+        </a>
+        <p class="footer-tagline">
+          The next-generation marketplace. Combining spatial 3D inspection, 
+          escrow buyer protection, and global artisan collectives.
+        </p>
+        <div class="newsletter-box glass">
+          <input type="email" placeholder="Enter your email for private drops" />
+          <button class="btn btn-primary btn-sm btn-liquid">Subscribe</button>
+        </div>
+      </div>
+
+      <div class="footer-links-col">
+        <h4>Marketplace</h4>
+        <ul>
+          <li><a href="#/products?category=Audio+%26+Sound">Audio & Sound</a></li>
+          <li><a href="#/products?category=Wearables+%26+Tech">Wearables & Tech</a></li>
+          <li><a href="#/products?category=Smart+Home+%26+Living">Smart Living</a></li>
+          <li><a href="#/products?category=Photography+%26+Gear">Photography Gear</a></li>
+          <li><a href="#/products?category=Work+%26+Desk+Setup">Desk Architecture</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-links-col">
+        <h4>Trust & Assurance</h4>
+        <ul>
+          <li><a href="#/">30-Day Escrow Guarantee</a></li>
+          <li><a href="#/">Carbon-Neutral Logistics</a></li>
+          <li><a href="#/">Artisan Flagship Onboarding</a></li>
+          <li><a href="#/">Anti-Counterfeit Protocol</a></li>
+          <li><a href="#/">Conflict-Free Supply Chains</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-links-col">
+        <h4>Developer & API</h4>
+        <ul>
+          <li><a href="/api/products" target="_blank">Spring Boot REST API</a></li>
+          <li><a href="/h2-console" target="_blank">H2 In-Memory DB</a></li>
+          <li><a href="https://github.com/pmndrs/react-three-fiber" target="_blank">Three.js Visuals</a></li>
+          <li><a href="https://github.com/dashersw/liquid-glass-js" target="_blank">Liquid Glass UI</a></li>
+          <li><a href="https://github.com/ruucm/shadergradient" target="_blank">WebGL Shaders</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom max-width-wrap">
+      <div class="footer-legal">
+        <span>© 2026 JustBuy Inc. All rights reserved.</span>
+        <a href="#/">Privacy Policy</a>
+        <a href="#/">Terms of Service</a>
+        <a href="#/">Cookie Preferences</a>
+      </div>
+      <div class="footer-badges">
+        <span class="secure-badge">🔒 256-Bit Escrow Secured</span>
+        <span class="secure-badge">🌿 100% Carbon Neutral Shipping</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Master JavaScript Application Bundle -->
+  <script type="module" src="../js/app.js"></script>
+</body>
+</html>
