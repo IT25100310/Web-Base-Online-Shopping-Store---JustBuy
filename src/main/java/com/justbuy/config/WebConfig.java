@@ -14,9 +14,9 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedHeaders("*");
     }
 
-    // SPA fallback — serve index.html for all non-API, non-static routes
+    // Serve the static frontend entry point at the application root.
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("/").setViewName("forward:/index.html");
+        registry.addViewController("/").setViewName("forward:/HTML/index.html");
     }
 }
