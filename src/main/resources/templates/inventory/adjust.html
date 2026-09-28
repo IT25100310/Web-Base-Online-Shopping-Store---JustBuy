@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Adjust Stock - E-Shop Inventory</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div th:replace="~{fragments/layout :: nav}"></div>
+<main class="container">
+<div th:replace="~{fragments/layout :: messages}"></div>
+<div class="page-header"><div><p class="eyebrow">Stock Adjustment</p><h1 th:text="${item.productName}"></h1><p class="muted"><span th:text="${item.sku}"></span> · Current quantity: <strong th:text="${item.quantity}"></strong></p></div><a class="btn ghost" th:href="@{/inventory}">Back</a></div>
+<div class="card form-card narrow">
+<form th:object="${form}" th:action="@{/inventory/{id}/adjust(id=${item.id})}" method="post">
+    <div class="form-error" th:if="${#fields.hasGlobalErrors()}" th:each="e : ${#fields.globalErrors()}" th:text="${e}"></div>
+    <label>Operation<select th:field="*{type}"><option value="">Select operation</option><option th:each="t : ${types}" th:value="${t}" th:text="${t.label}"></option></select><small class="error" th:errors="*{type}"></small></label>
+    <label>Quantity<input type="number" min="1" th:field="*{quantity}" placeholder="1"><small class="error" th:errors="*{quantity}"></small></label>
+    <label>Reference ID <span class="optional">optional</span><input th:field="*{referenceId}" placeholder="ORD-1007 / RTN-1007"></label>
+    <label>Reason <span class="optional">optional</span><textarea rows="3" th:field="*{reason}" placeholder="Why is this stock changing?"></textarea></label>
+    <label>Performed By<input th:field="*{performedBy}" placeholder="Seller / Admin"></label>
+    <div class="hint">Order deduction cannot reduce stock below zero. Low-stock alerts are created or resolved automatically after every adjustment.</div>
+    <div class="form-actions"><button class="btn primary" type="submit">Update Stock</button><a class="btn ghost" th:href="@{/inventory}">Cancel</a></div>
+</form>
+</div>
+</main>
+</body>
+</html>

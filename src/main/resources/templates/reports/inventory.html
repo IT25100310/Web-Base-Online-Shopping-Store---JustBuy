@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Inventory Report - E-Shop Inventory</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div th:replace="~{fragments/layout :: nav}"></div>
+<main class="container">
+<div th:replace="~{fragments/layout :: messages}"></div>
+<div class="page-header"><div><p class="eyebrow">Admin Report</p><h1>Inventory Report</h1><p class="muted">Stock performance summary grouped by vendor and category.</p></div><a class="btn primary" th:href="@{/reports/inventory.csv}">Download CSV</a></div>
+<div class="cards"><div class="card metric"><span>Active Products</span><strong th:text="${summary.activeProducts}"></strong></div><div class="card metric warning"><span>Low Stock</span><strong th:text="${summary.lowStockItems}"></strong></div><div class="card metric danger"><span>Out of Stock</span><strong th:text="${summary.outOfStockItems}"></strong></div><div class="card metric"><span>Total Units</span><strong th:text="${summary.totalUnits}"></strong></div></div>
+<div class="grid-2"><section class="card"><h2>Units by Vendor</h2><div class="bar-row" th:each="e : ${vendorUnits}"><span th:text="${e.key}"></span><strong th:text="${e.value}"></strong></div></section><section class="card"><h2>Units by Category</h2><div class="bar-row" th:each="e : ${categoryUnits}"><span th:text="${e.key}"></span><strong th:text="${e.value}"></strong></div></section></div>
+<section class="card table-card"><h2>Current Stock Snapshot</h2><table><thead><tr><th>SKU</th><th>Product</th><th>Vendor</th><th>Qty</th><th>Threshold</th><th>Value</th></tr></thead><tbody><tr th:each="i : ${items}"><td th:text="${i.sku}"></td><td th:text="${i.productName}"></td><td th:text="${i.vendorName}"></td><td th:text="${i.quantity}"></td><td th:text="${i.reorderThreshold}"></td><td th:text="${'LKR ' + #numbers.formatDecimal(i.stockValue,1,2)}"></td></tr></tbody></table></section>
+</main>
+</body>
+</html>

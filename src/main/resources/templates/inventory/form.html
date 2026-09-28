@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Inventory Form - E-Shop Inventory</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div th:replace="~{fragments/layout :: nav}"></div>
+<main class="container">
+<div th:replace="~{fragments/layout :: messages}"></div>
+<div class="page-header"><div><p class="eyebrow">Inventory Record</p><h1 th:text="${title}"></h1><p class="muted">Required fields are validated before data is stored.</p></div><a class="btn ghost" th:href="@{/inventory}">Back</a></div>
+<div class="card form-card">
+<form th:object="${form}" th:action="${actionUrl}" method="post">
+    <div class="form-error" th:if="${#fields.hasGlobalErrors()}" th:each="e : ${#fields.globalErrors()}" th:text="${e}"></div>
+    <div class="form-grid">
+        <label>SKU<input th:field="*{sku}" placeholder="e.g. LMP-305"><small class="error" th:errors="*{sku}"></small></label>
+        <label>Product Name<input th:field="*{productName}" placeholder="Product name"><small class="error" th:errors="*{productName}"></small></label>
+        <label>Category<input th:field="*{category}" placeholder="Electronics"><small class="error" th:errors="*{category}"></small></label>
+        <label>External Product ID <span class="optional">optional</span><input th:field="*{externalProductId}" placeholder="Product module ID"><small class="error" th:errors="*{externalProductId}"></small></label>
+        <label>Vendor ID<input th:field="*{vendorId}" placeholder="V001"><small class="error" th:errors="*{vendorId}"></small></label>
+        <label>Vendor Name<input th:field="*{vendorName}" placeholder="Seller name"><small class="error" th:errors="*{vendorName}"></small></label>
+        <label>Current Quantity<input type="number" min="0" th:field="*{quantity}"><small class="error" th:errors="*{quantity}"></small></label>
+        <label>Reorder Threshold<input type="number" min="0" th:field="*{reorderThreshold}"><small class="error" th:errors="*{reorderThreshold}"></small></label>
+        <label>Unit Price (LKR)<input type="number" min="0" step="0.01" th:field="*{unitPrice}"><small class="error" th:errors="*{unitPrice}"></small></label>
+        <label>Stock Location<select th:field="*{locationId}"><option value="">Select location</option><option th:each="loc : ${locations}" th:value="${loc.id}" th:text="${loc.code + ' - ' + loc.name}"></option></select><small class="error" th:errors="*{locationId}"></small></label>
+    </div>
+    <div class="form-actions"><button class="btn primary" type="submit">Save Inventory Item</button><a class="btn ghost" th:href="@{/inventory}">Cancel</a></div>
+</form>
+</div>
+</main>
+</body>
+</html>

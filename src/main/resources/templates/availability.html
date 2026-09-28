@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Product Availability - E-Shop Inventory</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div th:replace="~{fragments/layout :: nav}"></div>
+<main class="container">
+<div th:replace="~{fragments/layout :: messages}"></div>
+<div class="page-header"><div><p class="eyebrow">Customer Function</p><h1>Check Product Availability</h1><p class="muted">This simulates the inventory availability check used by the storefront/cart module.</p></div></div>
+<div class="card form-card narrow"><form method="get" th:action="@{/availability}"><label>SKU<input name="sku" th:value="${sku}" placeholder="MOU-101"></label><label>Required Quantity<input type="number" min="1" name="quantity" th:value="${quantity}"></label><div class="form-actions"><button class="btn primary" type="submit">Check Stock</button></div></form></div>
+<div class="card result" th:if="${result}"><h2 th:text="${result.productName}"></h2><div th:if="${result.available}" class="availability yes">Available</div><div th:unless="${result.available}" class="availability no">Not Available</div><p>Available quantity: <strong th:text="${result.availableQuantity}"></strong></p><p>Requested quantity: <strong th:text="${result.requestedQuantity}"></strong></p><p>Status: <strong th:text="${result.status}"></strong></p></div>
+</main>
+</body>
+</html>

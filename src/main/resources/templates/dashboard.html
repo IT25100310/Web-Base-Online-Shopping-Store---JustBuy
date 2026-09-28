@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dashboard - E-Shop Inventory</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div th:replace="~{fragments/layout :: nav}"></div>
+<main class="container">
+<div th:replace="~{fragments/layout :: messages}"></div>
+<div class="page-header">
+    <div><p class="eyebrow">Inventory Management</p><h1>Stock Dashboard</h1><p class="muted">Real-time stock levels, alerts and recent inventory activity.</p></div>
+    <a class="btn primary" th:href="@{/inventory/new}">+ Add Inventory</a>
+</div>
+<div class="cards">
+    <div class="card metric"><span>Active Products</span><strong th:text="${summary.activeProducts}">0</strong></div>
+    <div class="card metric warning"><span>Low Stock</span><strong th:text="${summary.lowStockItems}">0</strong></div>
+    <div class="card metric danger"><span>Out of Stock</span><strong th:text="${summary.outOfStockItems}">0</strong></div>
+    <div class="card metric"><span>Total Units</span><strong th:text="${summary.totalUnits}">0</strong></div>
+    <div class="card metric"><span>Stock Value (LKR)</span><strong th:text="${#numbers.formatDecimal(summary.totalStockValue,1,2)}">0</strong></div>
+</div>
+<div class="grid-2">
+    <section class="card">
+        <div class="section-title"><h2>Open Low-Stock Alerts</h2><a th:href="@{/alerts}">View all</a></div>
+        <div class="empty" th:if="${#lists.isEmpty(alerts)}">No low-stock alerts. Inventory levels are healthy.</div>
+        <table th:unless="${#lists.isEmpty(alerts)}">
+            <thead><tr><th>SKU</th><th>Product</th><th>Stock</th><th>Threshold</th></tr></thead>
+            <tbody><tr th:each="a : ${alerts}"><td th:text="${a.item.sku}"></td><td th:text="${a.item.productName}"></td><td><span class="badge danger" th:text="${a.item.quantity}"></span></td><td th:text="${a.reorderThreshold}"></td></tr></tbody>
+        </table>
+    </section>
+    <section class="card">
+        <div class="section-title"><h2>Recent Stock Activity</h2><a th:href="@{/inventory/audit}">Audit log</a></div>
+        <div class="empty" th:if="${#lists.isEmpty(transactions)}">No inventory transactions yet.</div>
+        <div class="activity" th:each="t : ${transactions}">
+            <div><strong th:text="${t.item.sku}"></strong> <span th:text="${t.type.label}"></span></div>
+            <div class="muted small"><span th:text="${t.previousQuantity}"></span> → <span th:text="${t.newQuantity}"></span> · <span th:text="${#temporals.format(t.createdAt,'dd MMM HH:mm')}"></span></div>
+        </div>
+    </section>
+</div>
+</main>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Inventory - E-Shop Inventory</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div th:replace="~{fragments/layout :: nav}"></div>
+<main class="container">
+<div th:replace="~{fragments/layout :: messages}"></div>
+<div class="page-header">
+    <div><p class="eyebrow">Seller / Admin</p><h1>Inventory Items</h1><p class="muted">Create, view, update, adjust and discontinue stock records.</p></div>
+    <a class="btn primary" th:href="@{/inventory/new}">+ Add New Stock</a>
+</div>
+<form class="filterbar" method="get" th:action="@{/inventory}">
+    <input type="text" name="q" placeholder="Search SKU, product or category" th:value="${q}">
+    <select name="vendor"><option value="">All vendors</option><option th:each="v : ${vendors}" th:value="${v}" th:text="${v}" th:selected="${v == selectedVendor}"></option></select>
+    <label class="check"><input type="checkbox" name="includeDiscontinued" value="true" th:checked="${includeDiscontinued}"> Show discontinued</label>
+    <button class="btn" type="submit">Filter</button>
+    <a class="btn ghost" th:href="@{/inventory}">Reset</a>
+</form>
+<div class="card table-card">
+<table>
+    <thead><tr><th>SKU</th><th>Product</th><th>Vendor</th><th>Location</th><th>Qty</th><th>Reorder</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody>
+    <tr th:each="item : ${items}" th:classappend="${item.lowStock} ? 'row-warning' : ''">
+        <td><a th:href="@{/inventory/{id}(id=${item.id})}" th:text="${item.sku}"></a></td>
+        <td><strong th:text="${item.productName}"></strong><div class="muted small" th:text="${item.category}"></div></td>
+        <td th:text="${item.vendorName}"></td>
+        <td th:text="${item.location.name}"></td>
+        <td><span class="badge" th:classappend="${item.quantity == 0} ? ' danger' : (${item.lowStock} ? ' warning' : ' success')" th:text="${item.quantity}"></span></td>
+        <td th:text="${item.reorderThreshold}"></td>
+        <td><span class="badge" th:classappend="${item.status.name() == 'ACTIVE'} ? ' success' : ' neutral'" th:text="${item.status}"></span></td>
+        <td class="actions">
+            <a class="btn tiny" th:if="${item.status.name() == 'ACTIVE'}" th:href="@{/inventory/{id}/adjust(id=${item.id})}">Adjust</a>
+            <a class="btn tiny ghost" th:href="@{/inventory/{id}/edit(id=${item.id})}">Edit</a>
+            <form th:if="${item.status.name() == 'ACTIVE'}" th:action="@{/inventory/{id}/discontinue(id=${item.id})}" method="post"><button class="btn tiny danger-btn" type="submit" onclick="return confirm('Mark this product as discontinued?')">Remove</button></form>
+            <form th:if="${item.status.name() == 'DISCONTINUED'}" th:action="@{/inventory/{id}/reactivate(id=${item.id})}" method="post"><button class="btn tiny" type="submit">Reactivate</button></form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<div class="empty" th:if="${#lists.isEmpty(items)}">No inventory items match the current filter.</div>
+</div>
+</main>
+</body>
+</html>

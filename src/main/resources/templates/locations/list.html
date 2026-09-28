@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Stock Locations - E-Shop Inventory</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div th:replace="~{fragments/layout :: nav}"></div>
+<main class="container">
+<div th:replace="~{fragments/layout :: messages}"></div>
+<div class="page-header"><div><p class="eyebrow">Warehouse Management</p><h1>Stock Locations</h1><p class="muted">Manage warehouse and store locations used by inventory items.</p></div><a class="btn primary" th:href="@{/locations/new}">+ Add Location</a></div>
+<div class="card table-card"><table><thead><tr><th>Code</th><th>Name</th><th>Description</th><th>Status</th><th>Actions</th></tr></thead><tbody><tr th:each="loc : ${locations}"><td th:text="${loc.code}"></td><td th:text="${loc.name}"></td><td th:text="${loc.description ?: '-'}"></td><td><span class="badge" th:classappend="${loc.active} ? ' success' : ' neutral'" th:text="${loc.active ? 'ACTIVE' : 'INACTIVE'}"></span></td><td class="actions"><a class="btn tiny ghost" th:href="@{/locations/{id}/edit(id=${loc.id})}">Edit</a><form th:if="${loc.active}" th:action="@{/locations/{id}/deactivate(id=${loc.id})}" method="post"><button class="btn tiny danger-btn" type="submit">Deactivate</button></form></td></tr></tbody></table></div>
+</main>
+</body>
+</html>

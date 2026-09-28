@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Location Form - E-Shop Inventory</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div th:replace="~{fragments/layout :: nav}"></div>
+<main class="container">
+<div th:replace="~{fragments/layout :: messages}"></div>
+<div class="page-header"><div><p class="eyebrow">Warehouse Location</p><h1 th:text="${title}"></h1></div><a class="btn ghost" th:href="@{/locations}">Back</a></div>
+<div class="card form-card narrow"><form th:object="${form}" th:action="${actionUrl}" method="post"><div class="form-error" th:if="${#fields.hasGlobalErrors()}" th:each="e : ${#fields.globalErrors()}" th:text="${e}"></div><label>Location Code<input th:field="*{code}" placeholder="MAIN-WH"><small class="error" th:errors="*{code}"></small></label><label>Name<input th:field="*{name}" placeholder="Main Warehouse"><small class="error" th:errors="*{name}"></small></label><label>Description<textarea rows="3" th:field="*{description}"></textarea></label><div class="form-actions"><button class="btn primary" type="submit">Save Location</button><a class="btn ghost" th:href="@{/locations}">Cancel</a></div></form></div>
+</main>
+</body>
+</html>
