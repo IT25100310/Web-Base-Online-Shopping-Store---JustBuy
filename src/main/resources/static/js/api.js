@@ -9,6 +9,33 @@ function adminHeaders(extra = {}) {
     return { ...extra, 'X-Admin-Email': admin?.email || '' };
 }
 
+async function optimizeAdvertisementImage(formData) {
+    const image = formData.get('image');
+    if (!(image instanceof File) || !image.size || image.size <= 2.5 * 1024 * 1024) return formData;
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = () => reject(new Error('The selected image could not be read.'));
+        reader.onload = () => {
+            const source = new Image();
+            source.onerror = () => reject(new Error('The selected file is not a valid image.'));
+            source.onload = () => {
+                const scale = Math.min(1, 1600 / Math.max(source.width, source.height));
+                const canvas = document.createElement('canvas');
+                canvas.width = Math.max(1, Math.round(source.width * scale));
+                canvas.height = Math.max(1, Math.round(source.height * scale));
+                canvas.getContext('2d').drawImage(source, 0, 0, canvas.width, canvas.height);
+                canvas.toBlob((blob) => {
+                    if (!blob) return reject(new Error('The selected image could not be compressed.'));
+                    formData.set('image', new File([blob], 'advertisement.jpg', { type: 'image/jpeg' }));
+                    resolve(formData);
+                }, 'image/jpeg', 0.82);
+            };
+            source.src = reader.result;
+        };
+        reader.readAsDataURL(image);
+    });
+}
+
 export const API = {
     // ============================================
     // CUSTOMER AUTHENTICATION
@@ -47,6 +74,17 @@ export const API = {
         return data;
     },
 
+    async unifiedLogin(email, password) {
+        const res = await fetch(`${API_BASE}/unified-auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.message || 'Sign in failed');
+        return data;
+    },
+
     async getAccountApplications(status = '') {
         const query = status ? `?status=${encodeURIComponent(status)}` : '';
         const res = await fetch(`${API_BASE}/account-applications${query}`, { headers: adminHeaders() });
@@ -77,6 +115,55 @@ export const API = {
         return res.json();
     },
 
+    async getAdminAuditLogs() {
+        const res = await fetch(`${API_BASE}/admin/accounts/audit-logs`, { headers: adminHeaders() });
+        const data = await res.json().catch(() => []);
+        if (!res.ok) throw new Error(data.message || 'Could not load audit logs');
+        return data;
+    },
+
+    async getActiveAds() {
+        const res = await fetch(`${API_BASE}/ads/active`);
+        if (!res.ok) throw new Error('Could not load advertisements');
+        return res.json();
+    },
+
+    async getAdminAds() {
+        const res = await fetch(`${API_BASE}/ads`, { headers: adminHeaders() });
+        if (!res.ok) throw new Error('Could not load advertisements');
+        return res.json();
+    },
+
+    async createAdvertisement(formData) {
+        formData = await optimizeAdvertisementImage(formData);
+        const res = await fetch(`${API_BASE}/ads`, { method: 'POST', headers: adminHeaders(), body: formData });
+        const data = await res.json().catch(() => ({}));
+        if (res.status === 413) throw new Error('The image is too large. Please choose an image under 25 MB.');
+        if (!res.ok) throw new Error(data.message || 'Could not create advertisement');
+        return data;
+    },
+
+    async updateAdvertisement(id, formData) {
+        formData = await optimizeAdvertisementImage(formData);
+        const res = await fetch(`${API_BASE}/ads/${id}`, { method: 'PUT', headers: adminHeaders(), body: formData });
+        const data = await res.json().catch(() => ({}));
+        if (res.status === 413) throw new Error('The image is too large. Please choose an image under 25 MB.');
+        if (!res.ok) throw new Error(data.message || 'Could not update advertisement');
+        return data;
+    },
+
+    async setAdvertisementStatus(id, active) {
+        const res = await fetch(`${API_BASE}/ads/${id}/status`, { method: 'PUT', headers: adminHeaders({ 'Content-Type': 'application/json' }), body: JSON.stringify({ active }) });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.message || 'Could not update advertisement status');
+        return data;
+    },
+
+    async deleteAdvertisement(id) {
+        const res = await fetch(`${API_BASE}/ads/${id}`, { method: 'DELETE', headers: adminHeaders() });
+        if (!res.ok) { const data = await res.json().catch(() => ({})); throw new Error(data.message || 'Could not delete advertisement'); }
+    },
+
     async getDriverAnalytics(driverId) {
         const res = await fetch(`${API_BASE}/driver/${encodeURIComponent(driverId)}/analytics`);
         if (!res.ok) throw new Error('Could not load driver analytics');
@@ -91,6 +178,28 @@ export const API = {
         });
         const data = await res.json().catch(() => ({}));
         if (!res.ok) throw new Error(data.message || 'Could not create account');
+        return data;
+    },
+
+    async updateAdminAccount(role, id, account) {
+        const res = await fetch(`${API_BASE}/admin/accounts/${encodeURIComponent(role)}/${id}`, {
+            method: 'PUT',
+            headers: adminHeaders({ 'Content-Type': 'application/json' }),
+            body: JSON.stringify(account)
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.message || 'Could not update account');
+        return data;
+    },
+
+    async changeAdminAccountRole(role, id, newRole) {
+        const res = await fetch(`${API_BASE}/admin/accounts/${encodeURIComponent(role)}/${id}/role`, {
+            method: 'PUT',
+            headers: adminHeaders({ 'Content-Type': 'application/json' }),
+            body: JSON.stringify({ role: newRole })
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.message || 'Could not change account role');
         return data;
     },
 
@@ -111,6 +220,7 @@ export const API = {
             const data = await res.json().catch(() => ({}));
             throw new Error(data.message || 'Could not delete account');
         }
+        return true;
     },
 
     async sellerLogin(email, password) {
@@ -137,6 +247,54 @@ export const API = {
             throw new Error(error.message || 'Driver login failed');
         }
         return res.json();
+    },
+
+    async uploadProfileImage(file) {
+        const user = JSON.parse(localStorage.getItem('jb_user') || 'null') || {};
+        if (!user.email || !user.role) throw new Error('Please sign in before uploading a profile picture.');
+        const formData = new FormData();
+        formData.append('image', file);
+        const res = await fetch(`${API_BASE}/profiles/picture`, { method: 'POST', headers: { 'X-User-Email': user.email, 'X-User-Role': user.role }, body: formData });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.message || 'Could not update profile picture');
+        return data;
+    },
+
+    profileImageUrl(user = JSON.parse(localStorage.getItem('jb_user') || 'null')) {
+        if (!user?.email || !user?.role) return '';
+        return `${API_BASE}/profiles/picture?role=${encodeURIComponent(user.role)}&email=${encodeURIComponent(user.email)}`;
+    },
+
+    async getCustomerProfile(id) {
+        const res = await fetch(`${API_BASE}/customer-profile?id=${encodeURIComponent(id)}`);
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.message || 'Could not load your profile');
+        return data;
+    },
+
+    async updateCustomerProfile(id, profile) {
+        const res = await fetch(`${API_BASE}/customer-profile?id=${encodeURIComponent(id)}`, {
+            method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(profile)
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.message || 'Could not update your profile');
+        return data;
+    },
+
+    async createSupportTicket(ticket) {
+        const res = await fetch(`${API_BASE}/support/tickets`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(ticket)
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.message || 'Could not send your report');
+        return data;
+    },
+
+    async getCustomerSupportTickets(customerId) {
+        const res = await fetch(`${API_BASE}/support/tickets?customerId=${encodeURIComponent(customerId)}`);
+        const data = await res.json().catch(() => []);
+        if (!res.ok) throw new Error(data.message || 'Could not load support reports');
+        return data;
     },
 
     async submitAccountApplication(application) {
@@ -182,159 +340,143 @@ export const API = {
     },
 
     async getCategories() {
-        try {
-            const res = await fetch(`${API_BASE}/categories`);
-            if (res.ok) return await res.json();
-        } catch (e) {
-            console.warn('Backend API unavailable, using local mock for categories:', e);
-        }
-        return [
-            { id: 1, name: 'Audio & Sound', slug: 'audio-sound', icon: '🎧', productCount: 1420 },
-            { id: 2, name: 'Wearables & Tech', slug: 'wearables-tech', icon: '⌚', productCount: 980 },
-            { id: 3, name: 'Smart Home & Living', slug: 'smart-home', icon: '💡', productCount: 750 },
-            { id: 4, name: 'Photography & Gear', slug: 'photography-gear', icon: '📷', productCount: 630 },
-            { id: 5, name: 'Work & Desk Setup', slug: 'work-desk-setup', icon: '⌨️', productCount: 890 }
-        ];
+        const res = await fetch(`${API_BASE}/categories`);
+        if (!res.ok) throw new Error('Could not load categories');
+        return res.json();
     },
-
+    async createCategory(category) {
+        const res = await fetch(`${API_BASE}/categories`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(category) });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.message || 'Could not create category');
+        return data;
+    },
+    async updateCategory(id, category) {
+        const res = await fetch(`${API_BASE}/categories/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(category) });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.message || 'Could not update category');
+        return data;
+    },
+    async deleteCategory(id) {
+        const res = await fetch(`${API_BASE}/categories/${id}`, { method: 'DELETE' });
+        if (!res.ok) { const data = await res.json().catch(() => ({})); throw new Error(data.message || 'Could not delete category'); }
+    },
     async getProducts(params = {}) {
-        try {
-            const query = new URLSearchParams(params).toString();
-            const res = await fetch(`${API_BASE}/products${query ? '?' + query : ''}`);
-            if (res.ok) {
-                const data = await res.json();
-                return Array.isArray(data) ? data : (data.products || []);
-            }
-        } catch (e) {
-            console.warn('Backend API unavailable, using fallback mock for products:', e);
-        }
-        return this.getMockProducts(params);
+        const query = new URLSearchParams();
+        if (params.categoryId) query.set('categoryId', params.categoryId);
+        if (params.category) query.set('category', params.category);
+        if (params.page !== undefined) query.set('page', params.page);
+        if (params.size !== undefined) query.set('size', params.size);
+        if (params.sort) query.set('sort', params.sort === 'price-low' ? 'price_asc' : params.sort === 'price-high' ? 'price_desc' : params.sort);
+        const res = await fetch(`${API_BASE}/products${query.toString() ? '?' + query : ''}`);
+        if (!res.ok) throw new Error('Could not load products');
+        const data = await res.json();
+        return Array.isArray(data) ? data : (data.products || []);
     },
-
     async getFeaturedProducts() {
-        try {
-            const res = await fetch(`${API_BASE}/products/featured`);
-            if (res.ok) {
-                const data = await res.json();
-                const list = Array.isArray(data) ? data : (data.products || []);
-                if (list.length > 0) return list;
-            }
-        } catch (e) {
-            console.warn('Backend API unavailable, using fallback for featured:', e);
-        }
-        const all = this.getMockProducts();
-        return all.filter(p => p.featured || p.badge === 'Hot');
+        const res = await fetch(`${API_BASE}/products/featured`);
+        if (!res.ok) throw new Error('Could not load featured products');
+        const data = await res.json();
+        return Array.isArray(data) ? data : (data.products || []);
     },
-
     async getFlashDeals() {
-        try {
-            const res = await fetch(`${API_BASE}/products/flash-deals`);
-            if (res.ok) {
-                const data = await res.json();
-                const list = Array.isArray(data) ? data : (data.products || []);
-                if (list.length > 0) return list;
-            }
-        } catch (e) {
-            console.warn('Backend API unavailable, using fallback for flash deals:', e);
-        }
-        const all = this.getMockProducts();
-        return all.filter(p => p.flashDeal || (p.discountPercent && p.discountPercent > 25));
+        const res = await fetch(`${API_BASE}/products/flash-deals`);
+        if (!res.ok) throw new Error('Could not load flash deals');
+        const data = await res.json();
+        return Array.isArray(data) ? data : (data.products || []);
     },
-
     async getProductById(id) {
-        try {
-            const res = await fetch(`${API_BASE}/products/${id}`);
-            if (res.ok) return await res.json();
-        } catch (e) {
-            console.warn('Backend API unavailable, using fallback product detail:', e);
-        }
-        const all = this.getMockProducts();
-        return all.find(p => p.id === Number(id)) || all[0];
+        const res = await fetch(`${API_BASE}/products/${id}`);
+        if (!res.ok) return null;
+        return res.json();
     },
-
     async searchProducts(query) {
-        try {
-            const res = await fetch(`${API_BASE}/search?q=${encodeURIComponent(query)}`);
-            if (res.ok) {
-                const data = await res.json();
-                return Array.isArray(data) ? data : (data.products || []);
-            }
-        } catch (e) {
-            console.warn('Search API fallback:', e);
-        }
-        const all = this.getMockProducts();
-        const q = (query || '').toLowerCase();
-        return all.filter(p => p.name.toLowerCase().includes(q) || (p.tags && p.tags.toLowerCase().includes(q)));
+        const res = await fetch(`${API_BASE}/search?q=${encodeURIComponent(query)}`);
+        if (!res.ok) throw new Error('Could not search products');
+        const data = await res.json();
+        return Array.isArray(data) ? data : (data.products || []);
     },
-
     async getSeller(id) {
-        try {
-            const res = await fetch(`${API_BASE}/sellers/${id}`);
-            if (res.ok) return await res.json();
-        } catch (e) {
-            console.warn('Seller API fallback:', e);
-        }
-        return {
-            id: id || 1,
-            name: 'Aether Acoustic Labs',
-            badge: 'Top Rated Seller',
-            rating: 4.96,
-            salesCount: 14280,
-            responseTime: '< 1 hour',
-            followers: 89400,
-            avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80',
-            banner: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&auto=format&fit=crop&q=80',
-            bio: 'Pioneering ergonomic soundscapes, precision acoustic engineering, and studio-grade audio hardware designed for audiophiles and creators.'
-        };
+        const res = await fetch(`${API_BASE}/sellers/${id}`);
+        return res.ok ? res.json() : null;
     },
-
+    async getSellerProducts(id) {
+        const res = await fetch(`${API_BASE}/products/seller/${encodeURIComponent(id)}`);
+        if (!res.ok) throw new Error('Could not load seller products');
+        const data = await res.json();
+        return Array.isArray(data) ? data : (data.products || []);
+    },
     async getReviews(productId) {
-        try {
-            const res = await fetch(`${API_BASE}/reviews/product/${productId}`);
-            if (res.ok) return await res.json();
-        } catch (e) {
-            console.warn('Review API fallback:', e);
-        }
-        return [
-            {
-                id: 1,
-                author: 'Elena Rostova',
-                verified: true,
-                rating: 5,
-                date: '2 days ago',
-                title: 'Exceeded every single expectation!',
-                comment: 'The build quality is breathtaking. The liquid-glass aesthetic in real life matches the photos perfectly. Sound stage is wide and crisp.',
-                avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&auto=format&fit=crop&q=80',
-                photos: ['https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=300&auto=format&fit=crop&q=80'],
-                helpfulCount: 42
-            },
-            {
-                id: 2,
-                author: 'Marcus Vance',
-                verified: true,
-                rating: 5,
-                date: '1 week ago',
-                title: 'Seamless connection and insane battery life',
-                comment: 'Paired instantly with my Mac and phone. ANC blocks out office subway chatter with zero cabin pressure.',
-                avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&auto=format&fit=crop&q=80',
-                photos: [],
-                helpfulCount: 19
-            },
-            {
-                id: 3,
-                author: 'Chloe Dupont',
-                verified: true,
-                rating: 4,
-                date: '2 weeks ago',
-                title: 'Gorgeous design, premium packaging',
-                comment: 'Arrived in bespoke sustainable frosted packaging. Only wish the carrying case was slightly more compact, but the headphones themselves are 10/10.',
-                avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&auto=format&fit=crop&q=80',
-                photos: ['https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300&auto=format&fit=crop&q=80'],
-                helpfulCount: 8
-            }
-        ];
+        const res = await fetch(`${API_BASE}/reviews/product/${productId}`);
+        if (!res.ok) return [];
+        const reviews = await res.json();
+        return reviews.map((review) => ({ ...review, author: review.author || review.authorName || 'Customer', avatar: review.avatar || review.authorAvatar || '', date: review.date || review.createdAt || '', title: review.title || '', photos: review.photos || (review.imageUrl ? [review.imageUrl] : []) }));
     },
-
+    async createReview(review) {
+        const res = await fetch(`${API_BASE}/reviews`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(review) });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.message || 'Could not submit review');
+        return data;
+    },
+    async uploadProductImages(productId, files) {
+        const formData = new FormData();
+        files.forEach((file) => formData.append('images', file));
+        const res = await fetch(`${API_BASE}/products/${encodeURIComponent(productId)}/images`, { method: 'POST', body: formData });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.message || 'Could not upload product images');
+        return data;
+    },
+    async createProduct(product) {
+        const res = await fetch(`${API_BASE}/products`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(product)
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.message || 'Could not create product');
+        return data;
+    },
+    async updateProduct(id, product) {
+        const res = await fetch(`${API_BASE}/products/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(product)
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.message || 'Could not update product');
+        return data;
+    },
+    async deleteProduct(id) {
+        const res = await fetch(`${API_BASE}/products/${id}`, { method: 'DELETE' });
+        if (!res.ok) {
+            const data = await res.json().catch(() => ({}));
+            throw new Error(data.message || 'Could not delete product');
+        }
+    },
+    async getChatConversations(params) {
+        const query = new URLSearchParams(params);
+        const res = await fetch(`${API_BASE}/chat/conversations?${query}`);
+        const data = await res.json().catch(() => []);
+        if (!res.ok) throw new Error(data.message || 'Could not load conversations');
+        return data;
+    },
+    async createChatConversation(customerId, sellerId) {
+        const res = await fetch(`${API_BASE}/chat/conversations`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ customerId, sellerId }) });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.message || 'Could not open conversation');
+        return data;
+    },
+    async getChatMessages(conversationId) {
+        const res = await fetch(`${API_BASE}/chat/conversations/${encodeURIComponent(conversationId)}/messages`);
+        const data = await res.json().catch(() => []);
+        if (!res.ok) throw new Error(data.message || 'Could not load messages');
+        return data;
+    },
+    async sendChatMessage(conversationId, message) {
+        const res = await fetch(`${API_BASE}/chat/conversations/${encodeURIComponent(conversationId)}/messages`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(message) });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.message || 'Could not send message');
+        return data;
+    },
     async createOrder(orderData) {
         const res = await fetch(`${API_BASE}/orders`, {
             method: 'POST',
@@ -359,206 +501,4 @@ export const API = {
         return data;
     },
 
-    getMockProducts(filter = {}) {
-        const products = [
-            {
-                id: 1,
-                name: 'Aether Aura Pro ANC Wireless Headphones',
-                category: { id: 1, name: 'Audio & Sound' },
-                price: 249.00,
-                originalPrice: 329.00,
-                discountPercent: 24,
-                rating: 4.9,
-                reviewCount: 1420,
-                soldCount: 8940,
-                stock: 35,
-                badge: 'Best Seller',
-                featured: true,
-                flashDeal: true,
-                freeShipping: true,
-                thumbnailUrl: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&auto=format&fit=crop&q=80',
-                imageUrls: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&auto=format&fit=crop&q=80,https://images.unsplash.com/photo-1484704849700-f032a568e944?w=800&auto=format&fit=crop&q=80,https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=800&auto=format&fit=crop&q=80',
-                colors: 'Matte Charcoal,Warm Terracotta,Frosted Cream',
-                sizes: 'Standard',
-                tags: 'anc,wireless,bluetooth,audiophile,hifi',
-                description: 'Immerse in studio-grade fidelity with custom 40mm bio-cellulose drivers, hybrid active noise cancellation, and a liquid-smooth acoustic seal.'
-            },
-            {
-                id: 2,
-                name: 'Chronos Horizon OLED Titanium Smartwatch',
-                category: { id: 2, name: 'Wearables & Tech' },
-                price: 319.00,
-                originalPrice: 399.00,
-                discountPercent: 20,
-                rating: 4.8,
-                reviewCount: 890,
-                soldCount: 5210,
-                stock: 22,
-                badge: 'Hot Deal',
-                featured: true,
-                flashDeal: true,
-                freeShipping: true,
-                thumbnailUrl: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&auto=format&fit=crop&q=80',
-                imageUrls: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&auto=format&fit=crop&q=80,https://images.unsplash.com/photo-1579586337278-3befd40fd17a?w=800&auto=format&fit=crop&q=80',
-                colors: 'Brushed Silver,Titanium Black,Amber Gold',
-                sizes: '40mm,44mm',
-                tags: 'smartwatch,fitness,oled,titanium,health',
-                description: 'Forged from aerospace grade-5 titanium with a 1.4-inch micro-curved sapphire display, 14-day battery reserve, and biosensor suite.'
-            },
-            {
-                id: 3,
-                name: 'Lumina Sphere Ambient Sound & Light Sculpt',
-                category: { id: 3, name: 'Smart Home & Living' },
-                price: 189.00,
-                originalPrice: 249.00,
-                discountPercent: 24,
-                rating: 4.95,
-                reviewCount: 654,
-                soldCount: 3180,
-                stock: 18,
-                badge: 'Staff Pick',
-                featured: true,
-                flashDeal: false,
-                freeShipping: true,
-                thumbnailUrl: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=600&auto=format&fit=crop&q=80',
-                imageUrls: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=800&auto=format&fit=crop&q=80',
-                colors: 'Opaline White,Desert Clay,Smoked Obsidian',
-                sizes: 'One Size',
-                tags: 'lamp,speaker,ambient,smart-home,sculptural',
-                description: 'An acoustic-illuminative centerpiece that harmonizes circadian rhythm lighting with 360-degree spatial acoustic waves.'
-            },
-            {
-                id: 4,
-                name: 'Optica Lumix 35mm f/1.4 Mirrorless Prime Lens',
-                category: { id: 4, name: 'Photography & Gear' },
-                price: 549.00,
-                originalPrice: 699.00,
-                discountPercent: 21,
-                rating: 4.92,
-                reviewCount: 312,
-                soldCount: 1420,
-                stock: 12,
-                badge: 'Pro Grade',
-                featured: true,
-                flashDeal: false,
-                freeShipping: true,
-                thumbnailUrl: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=600&auto=format&fit=crop&q=80',
-                imageUrls: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=800&auto=format&fit=crop&q=80',
-                colors: 'Anodized Black',
-                sizes: 'E-Mount,X-Mount,Z-Mount',
-                tags: 'camera,lens,photography,prime,mirrorless',
-                description: 'Breathtaking bokeh and clinical edge-to-edge resolution with dual linear autofocus motors and nano-antireflective coating.'
-            },
-            {
-                id: 5,
-                name: 'Keystroke Nuance Mechanical Keyboard 75%',
-                category: { id: 5, name: 'Work & Desk Setup' },
-                price: 159.00,
-                originalPrice: 199.00,
-                discountPercent: 20,
-                rating: 4.88,
-                reviewCount: 1120,
-                soldCount: 6730,
-                stock: 45,
-                badge: 'Trending',
-                featured: false,
-                flashDeal: true,
-                freeShipping: true,
-                thumbnailUrl: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=600&auto=format&fit=crop&q=80',
-                imageUrls: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=800&auto=format&fit=crop&q=80',
-                colors: 'Retro Cream,Charcoal Slate,Sunset Terracotta',
-                sizes: 'Linear Yellow,Tactile Brown',
-                tags: 'keyboard,mechanical,desk,setup,typewriter',
-                description: 'Precision CNC-milled aluminum chassis with gasket mounting, factory-lubed switches, and tri-mode wireless connectivity.'
-            },
-            {
-                id: 6,
-                name: 'Vessel Geometric Ceramic Pour-Over Carafe',
-                category: { id: 3, name: 'Smart Home & Living' },
-                price: 68.00,
-                originalPrice: 85.00,
-                discountPercent: 20,
-                rating: 4.97,
-                reviewCount: 420,
-                soldCount: 2900,
-                stock: 30,
-                badge: 'Artisan',
-                featured: false,
-                flashDeal: false,
-                freeShipping: false,
-                thumbnailUrl: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=600&auto=format&fit=crop&q=80',
-                imageUrls: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=800&auto=format&fit=crop&q=80',
-                colors: 'Terracotta Matte,Sand Glaze,Obsidian',
-                sizes: '500ml,800ml',
-                tags: 'coffee,ceramic,pour-over,kitchen,lifestyle',
-                description: 'Hand-cast ceramic dripper engineered with 60-degree precision ribs for optimal thermal retention and extraction clarity.'
-            },
-            {
-                id: 7,
-                name: 'AeroGlide Ergonomic Magnetic MagSafe Stand',
-                category: { id: 5, name: 'Work & Desk Setup' },
-                price: 79.00,
-                originalPrice: 99.00,
-                discountPercent: 20,
-                rating: 4.85,
-                reviewCount: 380,
-                soldCount: 2150,
-                stock: 60,
-                badge: 'New',
-                featured: false,
-                flashDeal: true,
-                freeShipping: true,
-                thumbnailUrl: 'https://images.unsplash.com/photo-1586105251261-72a756497a11?w=600&auto=format&fit=crop&q=80',
-                imageUrls: 'https://images.unsplash.com/photo-1586105251261-72a756497a11?w=800&auto=format&fit=crop&q=80',
-                colors: 'Natural Sand,Graphite',
-                sizes: 'Universal',
-                tags: 'magsafe,desk,stand,phone,aluminum',
-                description: 'Weighted solid aluminum base with buttery fluid-damped 360-degree ball joint and hidden cable pass-through.'
-            },
-            {
-                id: 8,
-                name: 'Sonic Studio Dynamic USB-C Microphone',
-                category: { id: 1, name: 'Audio & Sound' },
-                price: 139.00,
-                originalPrice: 179.00,
-                discountPercent: 22,
-                rating: 4.91,
-                reviewCount: 512,
-                soldCount: 3450,
-                stock: 25,
-                badge: 'Best Seller',
-                featured: true,
-                flashDeal: false,
-                freeShipping: true,
-                thumbnailUrl: 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=600&auto=format&fit=crop&q=80',
-                imageUrls: 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=800&auto=format&fit=crop&q=80',
-                colors: 'Warm Cream,Deep Bronze',
-                sizes: 'Standard',
-                tags: 'mic,microphone,podcast,audio,streaming',
-                description: 'Broadcast-quality cardioid capsule with internal pop filter, zero-latency monitoring, and built-in analog limiter.'
-            }
-        ];
-
-        let filtered = [...products];
-        if (filter.category) {
-            filtered = filtered.filter(p => p.category && p.category.name.toLowerCase().includes(filter.category.toLowerCase()));
-        }
-        if (filter.minPrice) {
-            filtered = filtered.filter(p => p.price >= Number(filter.minPrice));
-        }
-        if (filter.maxPrice) {
-            filtered = filtered.filter(p => p.price <= Number(filter.maxPrice));
-        }
-        if (filter.badge) {
-            filtered = filtered.filter(p => p.badge === filter.badge);
-        }
-        if (filter.sort === 'price-low') {
-            filtered.sort((a, b) => a.price - b.price);
-        } else if (filter.sort === 'price-high') {
-            filtered.sort((a, b) => b.price - a.price);
-        } else if (filter.sort === 'rating') {
-            filtered.sort((a, b) => b.rating - a.rating);
-        }
-        return filtered;
-    }
 };

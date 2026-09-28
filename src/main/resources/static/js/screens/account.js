@@ -1,165 +1,51 @@
-// ============================================
-// JustBuy — Screen: User Account & Orders
-// ============================================
-
 import { Store } from '../store.js';
 import { API } from '../api.js';
 
+const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const statusClass = (status) => String(status || '').toLowerCase().replace(/[^a-z]+/g, '-');
+const input = (label, name, value = '', type = 'text', extra = '') => `<label>${label}<input name="${name}" type="${type}" value="${esc(value)}" ${extra}></label>`;
+
 export const AccountScreen = {
     render() {
-        const user = Store.state.user || {
-            name: 'Guest shopper',
-            email: 'Sign in to manage your account',
-            avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
-            address: 'No saved delivery address'
-        };
-        const displayName = user.fullName || user.name || 'JustBuy user';
-        const email = user.email || 'Sign in to manage your account';
-        const address = user.address || 'No saved delivery address';
-        const avatar = user.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80';
+        const user = Store.state.user || {};
+        const displayName = user.fullName || user.name || 'JustBuy customer';
+        const email = user.email || '';
+        const avatar = user.avatar || API.profileImageUrl(user) || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80';
         const role = user.role || 'customer';
-        const isCustomer = role === 'customer';
-        const dashboardLink = role === 'seller'
-            ? '<a href="/HTML/seller-dashboard.html" class="btn btn-primary btn-liquid">Open Seller Dashboard</a>'
-            : role === 'driver'
-                ? '<a href="/HTML/delivery-dashboard.html" class="btn btn-primary btn-liquid">Open Delivery Dashboard</a>'
-                : '';
-        const applicationState = JSON.parse(localStorage.getItem('jb_account_application') || 'null');
-
-        return `
-      <div class="account-page">
-        <!-- Profile Banner -->
-        <div class="account-header glass-lg">
-          <img src="${avatar}" alt="${displayName}" class="account-avatar" />
-          <div class="account-info">
-            <div class="account-name-row">
-              <h1>${displayName}</h1>
-              <span class="verified-pill">🛡️ Tier 1 Verified Member</span>
-            </div>
-            <p class="account-email">${email}</p>
-            <span class="account-meta">Default Shipping: ${address}</span>
-          </div>
-        </div>
-
-        <!-- Orders & Account Sections -->
-        <div class="account-grid">
-          <!-- Order History -->
-          <div class="account-card glass">
-            <div class="card-heading-row">
-              <span class="heading-icon">📦</span>
-              <h2>Recent Orders</h2>
-            </div>
-
-            <div class="orders-list">
-              <div class="order-item-card glass">
-                <div class="order-item-header">
-                  <div>
-                    <strong>Order #JB-992014</strong>
-                    <span class="order-date">Placed on Sept 12, 2026</span>
-                  </div>
-                  <span class="status-pill status-shipped">🚚 In Transit</span>
-                </div>
-                <div class="order-item-body">
-                  <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=80&auto=format&fit=crop&q=80" alt="Product" class="order-thumb" />
-                  <div class="order-details">
-                    <h4>Aether Aura Pro ANC Wireless Headphones</h4>
-                    <span>Qty: 1 • Matte Charcoal • Total: $249.00</span>
-                  </div>
-                  <a href="#/order-success/JB-992014" class="btn btn-glass btn-sm">Track Package</a>
-                </div>
-              </div>
-
-              <div class="order-item-card glass">
-                <div class="order-item-header">
-                  <div>
-                    <strong>Order #JB-841920</strong>
-                    <span class="order-date">Placed on Aug 28, 2026</span>
-                  </div>
-                  <span class="status-pill status-delivered">✓ Delivered</span>
-                </div>
-                <div class="order-item-body">
-                  <img src="https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=80&auto=format&fit=crop&q=80" alt="Product" class="order-thumb" />
-                  <div class="order-details">
-                    <h4>Keystroke Nuance Mechanical Keyboard 75%</h4>
-                    <span>Qty: 1 • Retro Cream • Total: $159.00</span>
-                  </div>
-                  <button class="btn btn-glass btn-sm" onclick="alert('Receipt downloaded')">Receipt</button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="account-card glass seller-account-card">
-            <div class="card-heading-row">
-              <span class="heading-icon">${isCustomer ? '🪪' : role === 'seller' ? '🏪' : '🚚'}</span>
-              <h2>${isCustomer ? 'Become a JustBuy partner' : role === 'seller' ? 'Seller account' : 'Delivery account'}</h2>
-            </div>
-            ${isCustomer ? `<p class="account-help">Apply to sell products or deliver orders. An administrator reviews every application before access is granted.</p>
-            <form id="account-application-form" class="account-application-form">
-              <label>Apply as<select id="application-role"><option value="SELLER">Seller</option><option value="DELIVERY">Delivery driver</option></select></label>
-              <label>Full name<input name="applicantName" value="${displayName}" required></label>
-              <label>Email<input name="email" type="email" value="${email}" required></label>
-              <label>Address<input name="address" required placeholder="Your full address"></label>
-              <label>ID number<input name="idNumber" minlength="5" required placeholder="Government ID number"></label>
-              <label>Phone number<input name="phoneNumber" required placeholder="+1 555 000 0000"></label>
-              <div id="seller-application-fields"><label>Payment method<input name="paymentMethod" placeholder="Bank account or payment details"></label><label>Seller details<textarea name="businessDetails" rows="3" placeholder="Tell us about your store and products"></textarea></label></div>
-              <div id="delivery-application-fields" hidden><label>Vehicle number<input name="vehicleNumber" placeholder="Vehicle registration number"></label></div>
-              <button class="btn btn-primary btn-liquid" type="submit">Submit application</button><p id="application-message" class="account-help" aria-live="polite">${applicationState?.status === 'PENDING' && applicationState.requestedRole ? `Pending ${applicationState.requestedRole.toLowerCase()} application${applicationState.generatedSellerId ? ` · ${applicationState.generatedSellerId}` : ''}.` : ''}</p>
-            </form>` : `<p class="account-help">${role === 'seller' ? 'Manage your products, orders, and store earnings.' : 'Manage your assigned route and delivery earnings.'}</p><div class="account-actions">${dashboardLink}<button id="logout-btn" class="btn btn-glass">Log out</button></div>`}
-            ${isCustomer ? '<div class="account-actions"><button id="logout-btn" class="btn btn-glass">Log out</button></div>' : ''}
-          </div>
-
-          <!-- Saved Shipping Address -->
-          <div class="account-card glass">
-            <div class="card-heading-row">
-              <span class="heading-icon">📍</span>
-              <h2>Primary Delivery Hub</h2>
-            </div>
-            <div class="address-preview glass">
-              <strong>${displayName}</strong>
-              <p>${address}</p>
-              <p>United States</p>
-              <button class="btn btn-glass btn-sm mt-3" onclick="alert('Address updated')">Edit Address</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
+        return `<div class="account-page">
+          <div class="account-header glass-lg"><div class="account-avatar-wrap"><img src="${esc(avatar)}" alt="${esc(displayName)}" class="account-avatar" id="account-avatar" /><label class="btn btn-glass btn-sm account-avatar-upload" for="account-picture-input">Change photo</label><input id="account-picture-input" type="file" accept="image/*" hidden /></div><div class="account-info"><div class="account-name-row"><h1 id="account-heading-name">${esc(displayName)}</h1><span class="verified-pill">🛡️ Verified member</span></div><p class="account-email">${esc(email)}</p><span class="account-meta" id="account-header-address">${esc(user.address || 'Add a delivery address to your profile')}</span></div></div>
+          <div class="account-grid">
+            <section class="account-card glass"><div class="card-heading-row"><span class="heading-icon">✎</span><h2>Edit customer profile</h2></div><p class="account-help">Keep your contact and delivery details current for orders and support.</p><form id="customer-profile-form" class="account-application-form">${input('Full name','fullName',displayName,'text','required maxlength="150"')}${input('Email address','email',email,'email','readonly')}${input('Phone number','phoneNumber',user.phoneNumber || '','tel','placeholder="+1 555 000 0000"')}<label>Delivery address<textarea name="address" rows="3" placeholder="Your full delivery address">${esc(user.address || '')}</textarea></label><button class="btn btn-primary btn-liquid" type="submit">Save profile</button><p id="profile-message" class="account-help" aria-live="polite"></p></form></section>
+            <section class="account-card glass"><div class="card-heading-row"><span class="heading-icon">🛍️</span><h2>Become a seller or driver</h2></div><p class="account-help">Choose one application. Your customer account email is used for login, and an administrator reviews the submitted details.</p><div class="account-actions application-choice-actions"><button type="button" class="btn btn-primary btn-liquid" data-application-role="SELLER">Apply as seller</button><button type="button" class="btn btn-glass" data-application-role="DELIVERY">Apply as delivery driver</button></div><div id="application-panel" hidden></div></section>
+            <section class="account-card glass"><div class="card-heading-row"><span class="heading-icon">🛟</span><h2>Report a bug or issue</h2></div><p class="account-help">Send a private report to the JustBuy support team. It will appear in the live agent queue immediately.</p><form id="support-report-form" class="account-application-form"><label>Issue type<select name="category"><option value="BUG">Website bug</option><option value="ORDER">Order problem</option><option value="PAYMENT">Payment issue</option><option value="DELIVERY">Delivery issue</option><option value="ACCOUNT">Account help</option><option value="OTHER">Other</option></select></label><label>Priority<select name="priority"><option value="MEDIUM">Normal</option><option value="HIGH">High</option><option value="URGENT">Urgent</option></select></label>${input('Subject','subject','','text','required maxlength="200" placeholder="Briefly describe the issue"')}<label>Details<textarea name="description" rows="5" required placeholder="Tell our support agent what happened, and include an order number if relevant."></textarea></label><button class="btn btn-primary btn-liquid" type="submit">Send report to support</button><p id="support-report-message" class="account-help" aria-live="polite"></p></form></section>
+            <section class="account-card glass"><div class="card-heading-row"><span class="heading-icon">📦</span><h2>Recent orders</h2></div><div class="orders-list" id="account-orders"><p class="account-help">Loading your orders…</p></div></section>
+            <section class="account-card glass"><div class="card-heading-row"><span class="heading-icon">🎫</span><h2>My support reports</h2></div><div class="orders-list" id="account-tickets"><p class="account-help">Loading your reports…</p></div></section>
+          </div><div class="account-actions"><button id="logout-btn" class="btn btn-glass">Log out</button>${role === 'seller' ? '<a href="/HTML/seller-dashboard.html" class="btn btn-primary btn-liquid">Open seller dashboard</a>' : ''}${role === 'driver' ? '<a href="/HTML/delivery-dashboard.html" class="btn btn-primary btn-liquid">Open delivery dashboard</a>' : ''}</div>
+        </div>`;
     },
 
-    afterRender() {
-        const applicationForm = document.getElementById('account-application-form');
-        const applicationRole = document.getElementById('application-role');
-        const applicationMessage = document.getElementById('application-message');
-        const updateApplicationFields = () => {
-            const sellerFields = document.getElementById('seller-application-fields');
-            const deliveryFields = document.getElementById('delivery-application-fields');
-            const seller = applicationRole.value === 'SELLER';
-            sellerFields.hidden = !seller;
-            deliveryFields.hidden = seller;
-            sellerFields.querySelectorAll('input,textarea').forEach(field => field.required = seller);
-            deliveryFields.querySelectorAll('input').forEach(field => field.required = !seller);
-        };
-        applicationRole?.addEventListener('change', updateApplicationFields);
-        updateApplicationFields();
-        applicationForm?.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            const formData = new FormData(applicationForm);
-            const application = Object.fromEntries(formData.entries());
-            application.requestedRole = applicationRole.value;
-            applicationMessage.textContent = 'Submitting application...';
-            try {
-                const saved = await API.submitAccountApplication(application);
-                localStorage.setItem('jb_account_application', JSON.stringify(saved));
-                applicationMessage.textContent = `Application submitted for admin review${saved.generatedSellerId ? ` · Seller ID: ${saved.generatedSellerId}` : ''}.`;
-                applicationForm.querySelector('button[type="submit"]').disabled = true;
-            } catch (error) {
-                applicationMessage.textContent = error.message;
-            }
-        });
-        document.getElementById('logout-btn')?.addEventListener('click', () => {
-            Store.logout();
-            window.location.href = '/HTML/login.html';
-        });
+    async afterRender() {
+        const user = Store.state.user || {};
+        const profileMessage = document.getElementById('profile-message');
+        document.getElementById('account-picture-input')?.addEventListener('change', async (event) => { const file = event.target.files?.[0]; if (!file) return; try { const saved = await API.uploadProfileImage(file); document.getElementById('account-avatar').src = `${saved.imageUrl}&v=${Date.now()}`; Store.state.user.avatar = saved.imageUrl; localStorage.setItem('jb_user', JSON.stringify(Store.state.user)); Store.toast('Profile picture updated', 'success'); } catch (error) { Store.toast(error.message, 'warning'); } event.target.value = ''; });
+        document.getElementById('customer-profile-form')?.addEventListener('submit', async (event) => { event.preventDefault(); if (!user.id) { profileMessage.textContent = 'Please sign in to edit your profile.'; return; } const saved = Object.fromEntries(new FormData(event.target).entries()); profileMessage.textContent = 'Saving…'; try { const updated = await API.updateCustomerProfile(user.id, saved); Store.state.user = { ...Store.state.user, ...updated, name: updated.fullName }; localStorage.setItem('jb_user', JSON.stringify(Store.state.user)); document.getElementById('account-heading-name').textContent = updated.fullName; document.getElementById('account-header-address').textContent = updated.address || 'Add a delivery address to your profile'; profileMessage.textContent = 'Profile saved.'; Store.toast('Profile updated', 'success'); } catch (error) { profileMessage.textContent = error.message; } });
+        document.querySelectorAll('[data-application-role]').forEach((button) => button.addEventListener('click', () => renderApplicationForm(button.dataset.applicationRole, user)));
+        document.getElementById('support-report-form')?.addEventListener('submit', async (event) => { event.preventDefault(); const form = Object.fromEntries(new FormData(event.target).entries()); const message = document.getElementById('support-report-message'); if (!user.id || !user.email) { message.textContent = 'Please sign in before sending a support report.'; return; } message.textContent = 'Sending to support…'; try { const ticket = await API.createSupportTicket({ customerId: user.id, customerName: user.fullName || user.name, customerEmail: user.email, subject: form.subject, description: form.description, category: form.category, priority: form.priority, channel: 'IN_APP' }); event.target.reset(); message.textContent = `Report ${ticket.ticketNumber} is now in the support queue.`; Store.toast('Support report sent', 'success'); await loadTickets(user.id); } catch (error) { message.textContent = error.message; } });
+        document.getElementById('logout-btn')?.addEventListener('click', () => { Store.logout(); window.location.href = '/HTML/login.html'; });
+        await Promise.all([loadOrders(user.id), loadTickets(user.id)]);
     }
 };
+
+function renderApplicationForm(role, user) {
+    const panel = document.getElementById('application-panel'); if (!panel) return;
+    const seller = role === 'SELLER'; const displayName = user.fullName || user.name || ''; const email = user.email || '';
+    const personal = `${input('Full name','applicantName',displayName,'text','required')}${input('Email / username','email',email,'email','required readonly')}${input('Phone number','phoneNumber',user.phoneNumber || '','tel','required')}${input('Date of birth','dateOfBirth','','date','required')}<div class="application-form-grid">${input('House / building no.','houseNumber','','text','required')}${input('Street','street','','text','required')}${input('City','city','','text','required')}${input('Province','province','','text','required')}${input('Postal code','postalCode','','text','required')}</div><label>Address summary<textarea name="address" rows="2" required placeholder="Full address used for account and delivery">${esc(user.address || '')}</textarea></label>${input('Government ID / personal ID','idNumber','','text','required')}`;
+    const payment = `<div class="application-form-grid">${input('Bank name','bankName','','text','required')}${input('Account holder name','accountHolderName',displayName,'text','required')}${input('Account number','accountNumber','','text','required')}${input('Branch','branch','','text','required')}</div><label>Preferred payment method<select name="preferredPaymentMethod" required><option value="BANK_TRANSFER">Bank transfer</option><option value="MOBILE_WALLET">Mobile wallet</option><option value="OTHER">Other</option></select></label>`;
+    const fields = seller ? `<h3>Store and selling information</h3><div class="application-form-grid">${input('Store / shop name','storeName','','text','required')}${input('Business category','businessCategory','','text','required')}${input('Business phone','businessPhone','','tel')}${input('Business email','businessEmail',email,'email')}</div>${input('Business address','businessAddress','','text','required')}${input('Business registration no.','businessRegistrationNumber','','text')}<label>Business description<textarea name="businessDetails" rows="3" required></textarea></label>${input('Product categories','productCategories','','text')}${input('Products to sell','productsToSell','','text','required')}<label>Return policy<textarea name="returnPolicy" rows="2"></textarea></label><label>Shipping / delivery options<textarea name="shippingOptions" rows="2"></textarea></label>${input('Processing time','processingTime','','text')}<label>Verification documents / links<textarea name="verificationDocuments" rows="2" placeholder="Document names or secure links"></textarea></label><h3>Payment information</h3>${payment}` : `<h3>Driver and vehicle information</h3><div class="application-form-grid">${input('Driver ID','driverId','','text')}${input('Driving license number','licenseNumber','','text','required')}${input('License type','licenseType','','text')}${input('License expiry date','licenseExpiryDate','','date','required')}</div><div class="application-form-grid"><label>Vehicle type<select name="vehicleType" required><option value="MOTORCYCLE">Motorcycle</option><option value="THREE_WHEELER">Three-wheeler</option><option value="CAR">Car</option><option value="VAN">Van</option></select></label>${input('Vehicle number / registration','vehicleNumber','','text','required')}${input('Vehicle model','vehicleModel','','text','required')}${input('Vehicle color','vehicleColor','','text')}</div><label>Vehicle registration status<select name="vehicleRegistrationStatus"><option>Registered</option><option>Pending verification</option></select></label><label>Verification documents / links<textarea name="verificationDocuments" rows="2"></textarea></label><h3>Payment information</h3>${payment}`;
+    panel.hidden = false; panel.innerHTML = `<div class="application-panel-head"><div><p class="eyebrow">${seller ? 'SELLER REGISTRATION' : 'DRIVER REGISTRATION'}</p><h3>${seller ? 'Seller application' : 'Delivery driver application'}</h3></div><button type="button" class="btn btn-glass btn-sm" id="close-application">Close</button></div><form id="partner-application-form" class="account-application-form"><input type="hidden" name="requestedRole" value="${role}"><h3>Personal information</h3>${personal}${fields}<button class="btn btn-primary btn-liquid" type="submit">Submit ${seller ? 'seller' : 'driver'} application</button><p id="application-message" class="account-help" aria-live="polite"></p></form>`;
+    document.getElementById('close-application').onclick = () => { panel.hidden = true; };
+    document.getElementById('partner-application-form').onsubmit = async (event) => { event.preventDefault(); const message = document.getElementById('application-message'); const payload = Object.fromEntries(new FormData(event.target).entries()); message.textContent = 'Submitting for administrator review…'; try { const saved = await API.submitAccountApplication(payload); localStorage.setItem('jb_account_application', JSON.stringify(saved)); message.textContent = `Application submitted as ${role === 'SELLER' ? 'seller' : 'delivery driver'} and is pending review.`; event.target.querySelector('button[type="submit"]').disabled = true; Store.toast('Application submitted', 'success'); } catch (error) { message.textContent = error.message; } };
+}
+
+async function loadOrders(id) { const target = document.getElementById('account-orders'); if (!target || !id) return; try { const orders = await API.getOrdersForRole('CUSTOMER', id); target.innerHTML = orders.length ? orders.slice(0, 6).map(order => `<div class="order-item-card glass"><div class="order-item-header"><strong>Order #${esc(order.orderNumber || order.id)}</strong><span class="status-pill status-${statusClass(order.status)}">${esc(order.status || 'Processing')}</span></div><div class="order-item-body"><div class="order-details"><span>${esc(order.items?.length ? `${order.items.length} item(s)` : 'Order details')}</span><strong>${esc(Store.formatPrice(order.total || 0))}</strong></div></div></div>`).join('') : '<p class="account-help">No orders found yet.</p>'; } catch (error) { target.innerHTML = `<p class="account-help">${esc(error.message)}</p>`; } }
+async function loadTickets(id) { const target = document.getElementById('account-tickets'); if (!target || !id) return; try { const tickets = await API.getCustomerSupportTickets(id); target.innerHTML = tickets.length ? tickets.slice(0, 8).map(ticket => `<div class="order-item-card glass"><div class="order-item-header"><strong>${esc(ticket.ticketNumber)}</strong><span class="status-pill status-${statusClass(ticket.status)}">${esc(ticket.status)}</span></div><div class="order-item-body"><div class="order-details"><h4>${esc(ticket.subject)}</h4><span>${esc(ticket.category)} · ${esc(ticket.priority)}${ticket.assignedAgentName ? ` · Assigned to ${esc(ticket.assignedAgentName)}` : ' · Waiting for an agent'}</span></div></div></div>`).join('') : '<p class="account-help">You have not sent a support report.</p>'; } catch (error) { target.innerHTML = `<p class="account-help">${esc(error.message)}</p>`; } }

@@ -12,7 +12,8 @@ public class AdminAuthorizationService {
     public boolean isAuthorized(String email) {
         return email != null
                 && adminAccountRepository.findByEmailIgnoreCase(email.trim())
-                .map(account -> "ACTIVE".equalsIgnoreCase(account.getStatus()))
+                .map(account -> "ACTIVE".equalsIgnoreCase(account.getStatus())
+                        && "ADMIN".equalsIgnoreCase(account.getRole()))
                 .orElse(false);
     }
 }

@@ -10,18 +10,15 @@ import com.justbuy.repository.ProductRepository;
 import com.justbuy.repository.ReviewRepository;
 import com.justbuy.repository.SellerRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -147,7 +144,7 @@ public class SellerDashboardService {
     private Map<String, Object> lowStockMap(Product p) { return Map.of("name", p.getName(), "variant", p.getCategory() == null ? "" : p.getCategory().getName(), "stock", Optional.ofNullable(p.getStock()).orElse(0)); }
     private Map<String, Object> productMap(Product p) {
         Map<String, Object> m = new LinkedHashMap<>();
-        m.put("id", "PRD-" + p.getId()); m.put("backendId", p.getId()); m.put("sku", "PRD-" + p.getId());
+        m.put("id", "PRD-" + p.getId()); m.put("backendId", p.getId()); m.put("sku", Optional.ofNullable(p.getSku()).orElse("PRD-" + p.getId()));
         m.put("name", p.getName()); m.put("category", p.getCategory() == null ? "Uncategorized" : p.getCategory().getName());
         m.put("price", Optional.ofNullable(p.getPrice()).orElse(BigDecimal.ZERO)); m.put("stock", Optional.ofNullable(p.getStock()).orElse(0));
         m.put("status", Boolean.FALSE.equals(p.getFeatured()) && Boolean.FALSE.equals(p.getFlashDeal()) ? "active" : "active");

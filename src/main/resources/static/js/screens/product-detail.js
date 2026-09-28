@@ -14,17 +14,26 @@ export const ProductDetailScreen = {
     is3DMode: false,
 
     async render() {
-        const id = window.location.hash.split('/')[2]?.split('?')[0] || 1;
+        const id = window.location.hash.split('/')[2]?.split('?')[0];
         const product = await API.getProductById(id);
-        const seller = await API.getSeller(product.seller?.id || 1);
+        if (!product) return '<div class="section-container"><div class="glass sd-empty">Product not found.</div></div>';
+        const seller = product.seller || await API.getSeller(product.seller?.id) || {};
         const reviews = await API.getReviews(product.id);
 
-        const images = product.imageUrls ? product.imageUrls.split(',') : [product.thumbnailUrl];
-        const colors = product.colors ? product.colors.split(',') : ['Matte Black', 'Terracotta', 'Frosted White'];
-        const sizes = product.sizes ? product.sizes.split(',') : ['Standard'];
+        const images = (product.imageUrls || product.thumbnailUrl || '').split(',').map(image => image.trim()).filter(Boolean);
+        const colors = (product.colors || '').split(',').map(color => color.trim()).filter(Boolean);
+        const sizes = (product.sizes || '').split(',').map(size => size.trim()).filter(Boolean);
+        let bulkTiers = [];
+        try { bulkTiers = JSON.parse(product.bulkPricing || '[]'); } catch (error) { bulkTiers = []; }
+        bulkTiers = Array.isArray(bulkTiers) ? bulkTiers.filter(tier => Number(tier.discountPercent) > 0 && Number(tier.min) > 1) : [];
+        const reviewTotal = Number(product.reviewCount ?? reviews.length);
+        const reviewDistribution = [5, 4, 3, 2, 1].map(stars => {
+            const count = reviews.filter(review => Number(review.rating) === stars).length;
+            return { stars, percent: reviews.length ? Math.round((count / reviews.length) * 100) : 0 };
+        });
 
-        this.activeColor = colors[0].trim();
-        this.activeSize = sizes[0].trim();
+        this.activeColor = colors[0] || null;
+        this.activeSize = sizes[0] || null;
         this.quantity = 1;
 
         const priceFormatted = Store.formatPrice(product.price);
@@ -51,7 +60,7 @@ export const ProductDetailScreen = {
 
             <!-- 2D Photo Container -->
             <div id="gallery-2d-view" class="gallery-main-wrap glass">
-              <img id="main-product-img" src="${images[0]}" alt="${product.name}" class="gallery-main-img" />
+              ${images.length ? `<img id="main-product-img" src="${images[0]}" alt="${product.name}" class="gallery-main-img" />` : '<div class="sd-empty">No product image available.</div>'}
               <div class="badge-overlay">
                 ${product.badge ? `<span class="product-tag">${product.badge}</span>` : ''}
               </div>
@@ -88,7 +97,7 @@ export const ProductDetailScreen = {
           <div class="info-column">
             <div class="product-summary glass-lg">
               <div class="summary-top">
-                <span class="product-sku">SKU: JB-2026-${product.id}09</span>
+                <span class="product-sku">SKU: ${product.sku || product.id}</span>
                 <button class="wishlist-detail-btn ${isWished ? 'active' : ''}" id="detail-wishlist-btn">
                   ${isWished ? '❤️ Saved' : '🤍 Save for later'}
                 </button>
@@ -101,9 +110,9 @@ export const ProductDetailScreen = {
                 <div class="stars">★★★★★</div>
                 <span class="rating-val">${product.rating}</span>
                 <span class="dot-sep">•</span>
-                <a href="#reviews-anchor" class="review-link">${product.reviewCount || 142} verified reviews</a>
+                <a href="#reviews-anchor" class="review-link">${reviewTotal} verified reviews</a>
                 <span class="dot-sep">•</span>
-                <span class="sold-stat">🔥 ${product.soldCount || 850}+ orders shipped</span>
+                <span class="sold-stat">${product.soldCount ?? 0} orders shipped</span>
               </div>
 
               <!-- Price Row & Tiered Pricing -->
@@ -121,16 +130,17 @@ export const ProductDetailScreen = {
                     <span class="tier-qty">1 Unit</span>
                     <span class="tier-price">${priceFormatted}</span>
                   </div>
-                  <div class="tier-cell">
-                    <span class="tier-qty">2 - 4 Units</span>
-                    <span class="tier-price">${Store.formatPrice(product.price * 0.92)} /ea</span>
-                    <span class="tier-badge">Save 8%</span>
-                  </div>
-                  <div class="tier-cell">
-                    <span class="tier-qty">5+ Units</span>
-                    <span class="tier-price">${Store.formatPrice(product.price * 0.85)} /ea</span>
-                    <span class="tier-badge">Save 15%</span>
-                  </div>
+                  ${bulkTiers.map(tier => {
+                      const min = Number(tier.min);
+                      const max = tier.max ? Number(tier.max) : null;
+                      const discount = Number(tier.discountPercent);
+                      const unitPrice = Number(product.price) * (1 - discount / 100);
+                      return `<div class="tier-cell">
+                        <span class="tier-qty">${min}${max ? ` - ${max}` : '+'} Units</span>
+                        <span class="tier-price">${Store.formatPrice(unitPrice)} /ea</span>
+                        <span class="tier-badge">Save ${discount}%</span>
+                      </div>`;
+                  }).join('')}
                 </div>
               </div>
 
@@ -138,7 +148,7 @@ export const ProductDetailScreen = {
               <div class="selector-group">
                 <div class="selector-label">
                   <span>Color Option:</span>
-                  <strong id="selected-color-label">${colors[0]}</strong>
+                    <strong id="selected-color-label">${colors[0] || 'Seller did not specify'}</strong>
                 </div>
                 <div class="color-options-row">
                   ${colors.map((c, i) => `
@@ -153,7 +163,7 @@ export const ProductDetailScreen = {
               <div class="selector-group">
                 <div class="selector-label">
                   <span>Specification / Size:</span>
-                  <strong id="selected-size-label">${sizes[0]}</strong>
+                    <strong id="selected-size-label">${sizes[0] || 'Seller did not specify'}</strong>
                 </div>
                 <div class="size-options-row">
                   ${sizes.map((s, i) => `
@@ -173,7 +183,7 @@ export const ProductDetailScreen = {
                 </div>
                 <div class="stock-status">
                   <span class="pulse-indicator green"></span>
-                  <span class="stock-text">In Stock: <strong>${product.stock || 25} units</strong> available</span>
+                  <span class="stock-text">In Stock: <strong>${product.stock ?? 0} units</strong> available</span>
                 </div>
               </div>
 
@@ -192,34 +202,34 @@ export const ProductDetailScreen = {
                 <div class="delivery-item">
                   <span class="del-icon">🚚</span>
                   <div>
-                    <strong>Free Priority Shipping</strong>
-                    <p>Estimated arrival in 2-3 business days with real-time GPS tracking.</p>
+                    <strong>${product.shippingInfo || 'Shipping information not provided by seller'}</strong>
+                    <p>${product.deliveryEstimate || 'Delivery estimate not provided by seller'}</p>
                   </div>
                 </div>
                 <div class="delivery-item">
                   <span class="del-icon">🔄</span>
                   <div>
-                    <strong>Zero-Hassle 30-Day Returns</strong>
-                    <p>Hassle-free return collection directly from your doorstep.</p>
+                    <strong>Return policy</strong>
+                    <p>${product.returnPolicy || 'Return policy not provided by seller'}</p>
                   </div>
                 </div>
               </div>
 
               <!-- Seller Micro-Card -->
               <div class="seller-card glass">
-                <img src="${seller.avatar}" alt="${seller.name}" class="seller-avatar" />
+                <img src="${seller.avatar || ''}" alt="${seller.name || 'Seller'}" class="seller-avatar" />
                 <div class="seller-info">
                   <div class="seller-name-row">
-                    <a href="#/seller/${seller.id}" class="seller-name">${seller.name}</a>
-                    <span class="seller-badge">★ ${seller.badge}</span>
+                    <a href="#/seller/${seller.id || ''}" class="seller-name">${seller.name || 'Seller information unavailable'}</a>
+                    ${seller.badge ? `<span class="seller-badge">★ ${seller.badge}</span>` : ''}
                   </div>
                   <div class="seller-stats">
-                    <span>${seller.rating} Rating</span> • 
-                    <span>${seller.salesCount.toLocaleString()} sales</span> • 
-                    <span>Responds in ${seller.responseTime}</span>
+                    <span>${seller.rating ?? 0} Rating</span> • 
+                    <span>${Number(seller.salesCount || 0).toLocaleString()} sales</span> • 
+                    <span>${seller.responseTime || ''}</span>
                   </div>
                 </div>
-                <a href="#/seller/${seller.id}" class="btn btn-glass btn-sm">Storefront</a>
+                ${seller.id ? `<a href="#/seller/${seller.id}" class="btn btn-glass btn-sm">Storefront</a>` : ''}
               </div>
             </div>
           </div>
@@ -240,24 +250,14 @@ export const ProductDetailScreen = {
             <div class="score-box">
               <span class="score-big">${product.rating}</span>
               <div class="stars">★★★★★</div>
-              <span class="score-sub">Based on ${product.reviewCount || 142} ratings</span>
+              <span class="score-sub">Based on ${reviewTotal} ratings</span>
             </div>
             <div class="distribution-bars">
-              <div class="dist-row">
-                <span>5 Stars</span>
-                <div class="dist-track"><div class="dist-fill" style="width: 86%;"></div></div>
-                <span>86%</span>
-              </div>
-              <div class="dist-row">
-                <span>4 Stars</span>
-                <div class="dist-track"><div class="dist-fill" style="width: 11%;"></div></div>
-                <span>11%</span>
-              </div>
-              <div class="dist-row">
-                <span>3 Stars</span>
-                <div class="dist-track"><div class="dist-fill" style="width: 3%;"></div></div>
-                <span>3%</span>
-              </div>
+              ${reviewDistribution.map(row => `<div class="dist-row">
+                <span>${row.stars} Stars</span>
+                <div class="dist-track"><div class="dist-fill" style="width: ${row.percent}%;"></div></div>
+                <span>${row.percent}%</span>
+              </div>`).join('')}
             </div>
           </div>
 
@@ -302,7 +302,7 @@ export const ProductDetailScreen = {
     },
 
     afterRender() {
-        const id = window.location.hash.split('/')[2]?.split('?')[0] || 1;
+        const id = window.location.hash.split('/')[2]?.split('?')[0];
 
         // 1. Thumbnail click handler
         const mainImg = document.getElementById('main-product-img');
@@ -424,6 +424,33 @@ export const ProductDetailScreen = {
                 wishBtn.classList.toggle('active', active);
                 wishBtn.innerHTML = active ? '❤️ Saved' : '🤍 Save for later';
             }
+        });
+
+        document.getElementById('write-review-btn')?.addEventListener('click', () => {
+            const user = JSON.parse(localStorage.getItem('jb_user') || 'null');
+            if (!user?.id) { Store.toast('Please sign in before writing a review.', 'warning'); return; }
+            document.getElementById('review-modal')?.remove();
+            const modal = document.createElement('div');
+            modal.id = 'review-modal'; modal.className = 'modal-backdrop';
+            modal.innerHTML = `<form class="glass-lg" style="max-width:520px;width:calc(100% - 32px);padding:24px" id="review-form">
+                <div class="section-header"><h3>Write a review</h3><button type="button" class="btn btn-glass btn-sm" id="close-review-modal">Close</button></div>
+                <label>Rating<select name="rating" required><option value="5">5 - Excellent</option><option value="4">4 - Good</option><option value="3">3 - Average</option><option value="2">2 - Poor</option><option value="1">1 - Very poor</option></select></label>
+                <label>Review<textarea name="comment" rows="5" required placeholder="Tell other customers about this product..."></textarea></label>
+                <p class="account-help" id="review-form-message" aria-live="polite"></p>
+                <button type="submit" class="btn btn-primary btn-liquid">Submit review</button>
+            </form>`;
+            document.body.appendChild(modal);
+            document.getElementById('close-review-modal').onclick = () => modal.remove();
+            document.getElementById('review-form').onsubmit = async (event) => {
+                event.preventDefault();
+                const form = new FormData(event.target); const message = document.getElementById('review-form-message');
+                message.textContent = 'Saving review…';
+                try {
+                    await API.createReview({ product: { id: Number(id) }, authorName: user.fullName || user.name || 'Customer', authorAvatar: user.avatar || '', rating: Number(form.get('rating')), comment: form.get('comment'), verified: false });
+                    modal.remove(); Store.toast('Review submitted', 'success');
+                    const app = document.getElementById('app'); app.innerHTML = await this.render(); this.afterRender();
+                } catch (error) { message.textContent = error.message || 'Could not submit review.'; }
+            };
         });
     }
 };

@@ -1,6 +1,7 @@
 package com.justbuy.model;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 import java.math.BigDecimal;
@@ -27,6 +28,18 @@ public class Order {
     private Long customerId;
     private String placedByRole;
     private Long driverId;
+    private String driverStatus;
+    @Column(length = 1000)
+    private String deliveryNote;
+    @Column(length = 500)
+    private String deliveryIssue;
+    private LocalDateTime deliveredAt;
+    @Lob
+    @JsonIgnore
+    @Column(name = "delivery_proof_data", columnDefinition = "LONGBLOB")
+    private byte[] deliveryProofData;
+    @Column(name = "delivery_proof_content_type", length = 100)
+    private String deliveryProofContentType;
 
     @Column(precision = 10, scale = 2)
     private BigDecimal subtotal;

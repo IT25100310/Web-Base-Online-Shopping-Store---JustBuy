@@ -59,7 +59,7 @@ export const DealsScreen = {
     return `
       <div class="product-card glass" data-id="${product.id}">
         <div class="product-badge-stack">
-          <span class="discount-tag">-${product.discountPercent || 25}%</span>
+          ${product.discountPercent ? `<span class="discount-tag">-${product.discountPercent}%</span>` : ''}
           <span class="product-tag">Flash Deal</span>
         </div>
 

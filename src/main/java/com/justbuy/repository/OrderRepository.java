@@ -13,6 +13,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findByCustomerIdOrderByCreatedAtDesc(Long customerId);
     List<Order> findDistinctByItemsSellerIdOrderByCreatedAtDesc(Long sellerId);
     List<Order> findByDriverIdOrderByCreatedAtDesc(Long driverId);
+    List<Order> findByDriverIdIsNullAndStatusInOrderByCreatedAtAsc(List<String> statuses);
 
     @Query("SELECT DISTINCT o FROM Order o JOIN o.items i WHERE i.productId IN :productIds ORDER BY o.createdAt DESC")
     List<Order> findDistinctByItemProductIds(@Param("productIds") Set<Long> productIds);

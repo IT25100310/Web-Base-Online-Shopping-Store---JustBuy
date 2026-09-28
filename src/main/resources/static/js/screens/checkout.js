@@ -72,6 +72,29 @@ export const CheckoutScreen = {
                   <input type="tel" id="ship-phone" value="+1 (555) 234-8900" class="form-input glass" />
                 </div>
 
+                <div class="form-field half">
+                  <label for="ship-country">Country</label>
+                  <select id="ship-country" class="form-input glass">
+                    <option value="Sri Lanka" selected>Sri Lanka</option>
+                  </select>
+                </div>
+
+                <div class="form-field half">
+                  <label for="ship-state">Province</label>
+                  <input type="text" id="ship-state" list="sri-lanka-provinces" value="" class="form-input glass" placeholder="Start typing a province" autocomplete="address-level1" />
+                  <datalist id="sri-lanka-provinces">
+                    <option value="Central Province"></option>
+                    <option value="Eastern Province"></option>
+                    <option value="North Central Province"></option>
+                    <option value="Northern Province"></option>
+                    <option value="North Western Province"></option>
+                    <option value="Sabaragamuwa Province"></option>
+                    <option value="Southern Province"></option>
+                    <option value="Uva Province"></option>
+                    <option value="Western Province"></option>
+                  </datalist>
+                </div>
+
                 <div class="form-field full">
                   <label>Street Address</label>
                   <input type="text" id="ship-address" value="${userAddress}" class="form-input glass" required />
@@ -83,13 +106,8 @@ export const CheckoutScreen = {
                 </div>
 
                 <div class="form-field third">
-                  <label>State / Province</label>
-                  <input type="text" id="ship-state" value="NY" class="form-input glass" />
-                </div>
-
-                <div class="form-field third">
                   <label>Postal Code</label>
-                  <input type="text" id="ship-zip" value="10001" class="form-input glass" />
+                  <input type="text" id="ship-zip" value="" class="form-input glass" placeholder="Postal code" />
                 </div>
               </div>
             </section>
@@ -265,7 +283,13 @@ export const CheckoutScreen = {
                 const orderData = {
                     customerName: document.getElementById('ship-name')?.value || session.fullName || session.name,
                     customerEmail: document.getElementById('ship-email')?.value || session.email,
-                    shippingAddress: document.getElementById('ship-address')?.value || session.address,
+                    shippingAddress: [
+                        document.getElementById('ship-address')?.value,
+                        document.getElementById('ship-city')?.value,
+                        document.getElementById('ship-state')?.value,
+                        document.getElementById('ship-zip')?.value,
+                        document.getElementById('ship-country')?.value || 'Sri Lanka'
+                    ].map((part) => (part || '').trim()).filter(Boolean).join(', '),
                     customerId: session.id || null,
                     placedByRole: (session.role || 'CUSTOMER').toUpperCase(),
                     paymentMethod: 'Credit Card (Visa •••• 4242)',
@@ -275,18 +299,30 @@ export const CheckoutScreen = {
                     total: totals.total,
                     promoCode: Store.state.activePromo,
                     items: Store.state.cart.map(item => ({
-                        productId: item.id,
+                        productId: Number(item.id),
                         productName: item.name,
                         productImage: item.thumbnailUrl,
                         selectedColor: item.color,
                         selectedSize: item.size,
-                        quantity: item.quantity,
+                        quantity: Number(item.quantity),
                         price: item.price,
                         subtotal: item.price * item.quantity
                     }))
                 };
 
                 try {
+                    if (!orderData.customerName || !orderData.customerEmail || !orderData.shippingAddress) {
+                        throw new Error('Please complete your name, email, and shipping address before placing the order.');
+                    }
+                    if (!orderData.items.length || orderData.items.some((item) => !Number.isInteger(item.productId) || item.productId < 1 || !Number.isInteger(item.quantity) || item.quantity < 1)) {
+                        throw new Error('Your cart contains an invalid product or quantity. Please remove it and add the product again.');
+                    }
+                    const currentProducts = await Promise.all(orderData.items.map((item) => API.getProductById(item.productId)));
+                    currentProducts.forEach((product, index) => {
+                        const requested = orderData.items[index].quantity;
+                        if (!product) throw new Error(`Product #${orderData.items[index].productId} is no longer available. Please remove it from your cart.`);
+                        if (product.stock == null || Number(product.stock) < requested) throw new Error(`${product.name} has only ${Number(product.stock || 0)} unit(s) available. Please reduce the quantity.`);
+                    });
                     const result = await API.createOrder(orderData);
                     Store.clearCart();
                     window.location.hash = `#/order-success/${result.id}`;

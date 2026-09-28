@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,6 +31,7 @@ public class ProductService {
         product.setName(input.getName().trim());
         product.setSlug(input.getSlug());
         product.setDescription(input.getDescription());
+        product.setSku(input.getSku());
         product.setPrice(input.getPrice());
         product.setOriginalPrice(input.getOriginalPrice());
         product.setDiscountPercent(input.getDiscountPercent());
@@ -40,6 +40,10 @@ public class ProductService {
         product.setThumbnailUrl(input.getThumbnailUrl());
         product.setColors(input.getColors());
         product.setSizes(input.getSizes());
+        product.setBulkPricing(input.getBulkPricing());
+        product.setShippingInfo(input.getShippingInfo());
+        product.setReturnPolicy(input.getReturnPolicy());
+        product.setDeliveryEstimate(input.getDeliveryEstimate());
         product.setRating(input.getRating());
         product.setReviewCount(input.getReviewCount());
         product.setSoldCount(input.getSoldCount());

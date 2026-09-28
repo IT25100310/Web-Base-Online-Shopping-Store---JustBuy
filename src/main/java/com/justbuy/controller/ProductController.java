@@ -1,7 +1,9 @@
 package com.justbuy.controller;
 
 import com.justbuy.model.Product;
+import com.justbuy.repository.CategoryRepository;
 import com.justbuy.service.ProductService;
+import com.justbuy.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,15 +19,23 @@ import java.util.Map;
 public class ProductController {
 
     private final ProductService productService;
+    private final CategoryRepository categoryRepository;
+    private final ProductRepository productRepository;
 
     @GetMapping
     public ResponseEntity<Map<String, Object>> getAllProducts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "popular") String sort,
-            @RequestParam(required = false) Long categoryId) {
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) String category) {
 
         List<Product> products;
+        if (categoryId == null && category != null && !category.isBlank()) {
+            categoryId = categoryRepository.findByNameIgnoreCase(category.trim())
+                    .map(categoryEntity -> categoryEntity.getId())
+                    .orElse(null);
+        }
         if (categoryId != null) {
             products = productService.getByCategory(categoryId, page, size, sort);
         } else {
@@ -38,6 +48,11 @@ public class ProductController {
         response.put("size", size);
         response.put("total", products.size());
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/seller/{sellerId}")
+    public ResponseEntity<List<Product>> getSellerProducts(@PathVariable Long sellerId) {
+        return ResponseEntity.ok(productRepository.findBySellerId(sellerId));
     }
 
     @GetMapping("/{id}")

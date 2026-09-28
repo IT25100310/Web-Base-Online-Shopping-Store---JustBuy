@@ -29,6 +29,13 @@ public class AdminAccount {
     @Column(nullable = false)
     private String status;
 
+    @Lob
+    @Column(name = "profile_image_data", columnDefinition = "LONGBLOB")
+    private byte[] profileImageData;
+
+    @Column(name = "profile_image_content_type", length = 100)
+    private String profileImageContentType;
+
     @JsonIgnore
     private String passwordHash;
 

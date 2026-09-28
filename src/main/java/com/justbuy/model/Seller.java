@@ -59,6 +59,13 @@ public class Seller {
     private String location;
 
     private String phoneNumber;
+
+    @Lob
+    @Column(name = "profile_image_data", columnDefinition = "LONGBLOB")
+    private byte[] profileImageData;
+
+    @Column(name = "profile_image_content_type", length = 100)
+    private String profileImageContentType;
     private String idNumber;
     private String businessDetails;
     private String paymentMethod;

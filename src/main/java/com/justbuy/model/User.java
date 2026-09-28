@@ -38,6 +38,13 @@ public class User {
     private String phoneNumber;
     private String address;
 
+    @Lob
+    @Column(name = "profile_image_data", columnDefinition = "LONGBLOB")
+    private byte[] profileImageData;
+
+    @Column(name = "profile_image_content_type", length = 100)
+    private String profileImageContentType;
+
     @Column(nullable = false)
     @Builder.Default
     private String accountStatus = "ACTIVE";

@@ -160,7 +160,7 @@ export const ProductsScreen = {
           <div class="product-rating">
             <span class="stars">★★★★★</span>
             <span class="rating-val">${product.rating}</span>
-            <span class="review-count">(${product.soldCount || 820} sold)</span>
+            <span class="review-count">(${product.soldCount ?? 0} sold)</span>
           </div>
 
           <div class="product-price-row">

@@ -15,12 +15,45 @@
         <a class="brand" href="/HTML/index.html#/">⚡ Just<span>Buy</span></a>
         <div class="admin-header-actions"><span>JustBuy Administrator</span><button id="logout" class="button secondary">Log out</button></div>
     </header>
-    <section class="admin-hero"><div><p class="eyebrow">ACCOUNT GOVERNANCE</p><h1>Applications review center</h1><p>Review and approve seller and delivery applications before account access is provisioned.</p></div><div class="admin-avatar">JA</div></section>
-    <section class="admin-toolbar"><div class="filter-tabs"><button class="filter active" data-status="PENDING">Applications</button><button class="filter" data-status="">All applications</button><button class="filter" data-view="accounts">Accounts</button></div><div><button id="create-account" class="button primary">Create account</button><button id="refresh" class="button secondary">Refresh</button></div></section>
+    <section class="admin-hero"><div><p class="eyebrow">ACCOUNT GOVERNANCE</p><h1>Applications review center</h1><p>Review and approve seller and delivery applications before account access is provisioned.</p></div><a class="admin-avatar admin-profile-link" href="/HTML/admin-profile.html" title="Open admin profile" aria-label="Open admin profile">JA</a></section>
+    <section class="admin-toolbar"><div class="filter-tabs"><button class="filter active" data-status="PENDING">Applications</button><button class="filter" data-status="">All applications</button><button class="filter" data-view="accounts">All accounts</button><button class="filter" data-role-filter="ADMIN">Admins</button><button class="filter" data-role-filter="SUPPORT_AGENT">Agents</button><button class="filter" data-role-filter="CUSTOMER">Customers</button><button class="filter" data-role-filter="SELLER">Sellers</button><button class="filter" data-role-filter="DELIVERY">Drivers</button><button class="filter" data-view="audit">Audit log</button><button class="filter" data-view="ads">Advertisements</button></div><div><button id="create-account" class="button primary">Create account</button><button id="create-ad" class="button primary" hidden>Create ad</button><button id="refresh" class="button secondary">Refresh</button></div></section>
     <section id="summary" class="summary-grid"></section>
     <section id="application-list" class="application-list"></section>
 </main>
 <div id="toast" class="toast" aria-live="polite"></div>
-<script type="module" src="../js/admin-dashboard.js"></script>
+<dialog id="account-dialog" class="account-dialog">
+    <form method="dialog" id="account-form">
+        <div class="dialog-head"><div><p class="eyebrow">ACCOUNT GOVERNANCE</p><h2>Create account</h2></div><button type="button" class="dialog-close" id="close-account-dialog" aria-label="Close">×</button></div>
+        <div class="account-form-grid">
+            <label>Name<input id="account-name" required placeholder="Full name or store name"></label>
+            <label>Email<input id="account-email" type="email" required placeholder="name@example.com"></label>
+            <label>Password<input id="account-password" type="password" minlength="4" required placeholder="At least 4 characters"></label>
+            <label>Account type<select id="account-role"><option value="ADMIN">Administrator</option><option value="SUPPORT_AGENT">Support agent</option><option value="CUSTOMER">Customer</option><option value="DELIVERY">Delivery driver</option><option value="SELLER">Seller</option></select></label>
+            <label>Phone number<input id="account-phone" placeholder="Optional phone number"></label>
+            <label>Address<input id="account-address" placeholder="Optional address"></label>
+            <label class="driver-only">ID number<input id="account-id-number" placeholder="Driver ID number"></label>
+            <label class="driver-only">Vehicle number<input id="account-vehicle" placeholder="Vehicle registration"></label>
+        </div>
+        <p class="dialog-error" id="account-form-error"></p>
+        <div class="dialog-actions"><button type="button" class="button secondary" id="cancel-account">Cancel</button><button type="submit" class="button primary">Create account</button></div>
+    </form>
+</dialog>
+<dialog id="ad-dialog" class="account-dialog">
+    <form method="dialog" id="ad-form">
+        <div class="dialog-head"><div><p class="eyebrow">ADVERTISING CENTER</p><h2 id="ad-dialog-title">Create advertisement</h2></div><button type="button" class="dialog-close" id="close-ad-dialog" aria-label="Close">×</button></div>
+        <input type="hidden" id="ad-id">
+        <div class="account-form-grid">
+            <label>Topic<input id="ad-topic" required placeholder="Summer sale"></label>
+            <label>Title<input id="ad-title" required placeholder="Up to 50% off today"></label>
+            <label class="form-wide">Description<textarea id="ad-description" rows="3" placeholder="Short message customers will see"></textarea></label>
+            <label>Target link<input id="ad-target-url" type="url" placeholder="https://example.com (optional)"></label>
+            <label>Advertisement image<input id="ad-image" type="file" accept="image/*"><small class="form-help">Required when creating. Large images are compressed automatically. Maximum 25 MB.</small></label>
+            <label class="ad-active-field">Status<select id="ad-active"><option value="true">On — visible to customers</option><option value="false">Off — hidden</option></select></label>
+        </div>
+        <p class="dialog-error" id="ad-form-error"></p>
+        <div class="dialog-actions"><button type="button" class="button secondary" id="cancel-ad">Cancel</button><button type="submit" class="button primary">Save advertisement</button></div>
+    </form>
+</dialog>
+<script type="module" src="/js/admin-dashboard.js"></script>
 </body>
 </html>

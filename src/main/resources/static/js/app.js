@@ -30,6 +30,7 @@ class JustBuyApp {
         this.setupNavbar();
         this.setupSearch();
         this.setupQuickCartDrawer();
+        this.setupCustomerAdvertisements();
         this.setupChatWidget();
         this.setupCurrencySelector();
 
@@ -187,6 +188,27 @@ class JustBuyApp {
     static removeDrawerItem(idx) {
         Store.removeFromCart(idx);
         this.renderDrawerItems();
+    }
+
+    static async setupCustomerAdvertisements() {
+        if (Store.state.user?.role !== 'customer') return;
+        try {
+            const ads = await API.getActiveAds();
+            if (!ads.length) return;
+            const ad = ads[0];
+            const overlay = document.createElement('div');
+            overlay.className = 'customer-ad-overlay';
+            overlay.innerHTML = `<article class="customer-ad-popup" role="dialog" aria-modal="true" aria-label="${this.escapeAd(ad.title)}"><button class="customer-ad-close" type="button" aria-label="Close advertisement">×</button><img class="customer-ad-image" src="${this.escapeAd(ad.imageUrl)}" alt="${this.escapeAd(ad.title)}"><div class="customer-ad-copy"><span class="customer-ad-topic">${this.escapeAd(ad.topic || 'JustBuy special offer')}</span><h2>${this.escapeAd(ad.title)}</h2><p>${this.escapeAd(ad.description || '')}</p>${ad.targetUrl ? `<a class="btn btn-primary customer-ad-cta" href="${this.escapeAd(ad.targetUrl)}">Learn more</a>` : ''}</div></article>`;
+            document.body.appendChild(overlay);
+            const close = () => { overlay.classList.remove('visible'); setTimeout(() => overlay.remove(), 220); };
+            overlay.querySelector('.customer-ad-close')?.addEventListener('click', close);
+            overlay.addEventListener('click', (event) => { if (event.target === overlay) close(); });
+            requestAnimationFrame(() => overlay.classList.add('visible'));
+        } catch (error) { console.warn('Customer advertisements:', error); }
+    }
+
+    static escapeAd(value) {
+        return String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));
     }
 
     static setupChatWidget() {

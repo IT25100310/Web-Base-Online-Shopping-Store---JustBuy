@@ -9,7 +9,7 @@ export const SellerScreen = {
   async render() {
     const id = window.location.hash.split('/')[2] || 1;
     const seller = await API.getSeller(id);
-    const products = await API.getProducts();
+    const products = await API.getSellerProducts(id);
 
     return `
       <div class="seller-page">
@@ -83,9 +83,14 @@ export const SellerScreen = {
       Store.toast('Added to followed flagship stores!', 'success');
     });
 
-    document.getElementById('contact-seller-btn')?.addEventListener('click', () => {
-      Store.toast('Opening live encrypted artisan chat...', 'info');
-      document.getElementById('chat-widget')?.classList.add('open');
+    document.getElementById('contact-seller-btn')?.addEventListener('click', async () => {
+      const user = JSON.parse(localStorage.getItem('jb_user') || 'null');
+      const sellerId = Number(window.location.hash.split('/')[2]);
+      if (!user?.id) { Store.toast('Please sign in before messaging a seller.', 'warning'); return; }
+      try {
+        const conversation = await API.createChatConversation(user.id, sellerId);
+        window.location.hash = `#/messages?conversation=${conversation.id}`;
+      } catch (error) { Store.toast(error.message || 'Could not open seller messages.', 'warning'); }
     });
   }
 };

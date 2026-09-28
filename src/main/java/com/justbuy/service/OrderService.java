@@ -21,6 +21,7 @@ public class OrderService {
 
     private final OrderRepository orderRepo;
     private final ProductRepository productRepo;
+    private final DriverAssignmentService driverAssignmentService;
 
     @Transactional
     public Order createOrder(Order order) {
@@ -61,7 +62,9 @@ public class OrderService {
         order.setTotal(subtotal.add(shippingCost));
         order.setEstimatedDelivery(LocalDateTime.now().plusDays(7));
         order.setTrackingNumber("TRK" + System.currentTimeMillis());
-        return orderRepo.save(order);
+        Order saved = orderRepo.save(order);
+        driverAssignmentService.assignIfPossible(saved);
+        return orderRepo.save(saved);
     }
 
     @Transactional

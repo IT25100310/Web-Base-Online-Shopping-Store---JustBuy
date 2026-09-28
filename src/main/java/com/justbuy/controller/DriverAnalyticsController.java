@@ -23,7 +23,8 @@ public class DriverAnalyticsController {
         result.put("inTransit", count(orders, "IN_TRANSIT") + count(orders, "OUT_FOR_DELIVERY"));
         result.put("deliveredOrders", count(orders, "DELIVERED") + count(orders, "COMPLETED"));
         result.put("cancelledOrders", count(orders, "CANCELLED"));
-        result.put("earnings", orders.stream().filter(o -> !"CANCELLED".equalsIgnoreCase(o.getStatus()) && o.getTotal() != null).mapToDouble(o -> o.getTotal().doubleValue() * 0.05).sum());
+        result.put("failedOrders", count(orders, "FAILED") + count(orders, "CUSTOMER_UNAVAILABLE"));
+        result.put("earnings", orders.stream().filter(o -> "DELIVERED".equalsIgnoreCase(o.getStatus()) && o.getTotal() != null).mapToDouble(o -> o.getTotal().doubleValue() * 0.03).sum());
         result.put("orders", orders);
         return ResponseEntity.ok(result);
     }

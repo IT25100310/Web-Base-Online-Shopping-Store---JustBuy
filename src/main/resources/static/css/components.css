@@ -1912,6 +1912,12 @@ body.dark-mode .coupon-right code { background: var(--dark-surface-2); color: va
 .account-application-form input:focus, .account-application-form select:focus, .account-application-form textarea:focus { border-color: var(--accent-orange); box-shadow: 0 0 0 3px rgba(242,107,29,.12); }
 .account-application-form [hidden] { display: none; }
 .account-application-form .btn:disabled { cursor: not-allowed; opacity: .6; }
+.application-choice-actions { margin-top: var(--space-5); flex-wrap: wrap; }
+.application-panel { margin-top: var(--space-5); padding-top: var(--space-5); border-top: 1px solid var(--border-light); }
+.application-panel[hidden] { display: none; }
+.application-panel-head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-4); }
+.application-panel h3 { margin: var(--space-4) 0 0; color: var(--text-dark); font-size: var(--text-sm); }
+.application-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); }
 
 /* ═══════════ SELLER DASHBOARD ═══════════ */
 
@@ -2508,3 +2514,4 @@ body.dark-mode .auth-field input:focus { background: var(--dark-surface-2); }
     .auth-orbs { transform: scale(0.6); }
     .auth-form-panel { padding: var(--space-8) var(--space-6); }
 }
+.account-avatar-wrap{display:flex;flex-direction:column;align-items:center;gap:8px}.account-avatar-upload{white-space:nowrap}

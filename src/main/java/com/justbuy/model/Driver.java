@@ -47,6 +47,13 @@ public class Driver {
     @Column(name = "vehicle_number", nullable = false)
     private String vehicleNumber;
 
+    @Lob
+    @Column(name = "profile_image_data", columnDefinition = "LONGBLOB")
+    private byte[] profileImageData;
+
+    @Column(name = "profile_image_content_type", length = 100)
+    private String profileImageContentType;
+
     @Column(nullable = false)
     @Builder.Default
     private String status = "APPROVED";
@@ -54,6 +61,18 @@ public class Driver {
     @Column(nullable = false)
     @Builder.Default
     private Boolean verified = true;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean available = false;
+
+    @Column(name = "auto_accept_nearby", nullable = false)
+    @Builder.Default
+    private Boolean autoAcceptNearby = false;
+
+    @Column(name = "delivery_reminders", nullable = false)
+    @Builder.Default
+    private Boolean deliveryReminders = false;
 
     @Column(updatable = false)
     private LocalDateTime joinedAt;

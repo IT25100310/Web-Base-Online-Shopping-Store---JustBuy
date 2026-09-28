@@ -12,6 +12,7 @@ import { DealsScreen } from './screens/deals.js';
 import { WishlistScreen } from './screens/wishlist.js';
 import { SellerScreen } from './screens/seller.js';
 import { AccountScreen } from './screens/account.js';
+import { MessagesScreen } from './screens/messages.js';
 
 export const Router = {
   routes: [
@@ -25,12 +26,17 @@ export const Router = {
     { pattern: /^#\/wishlist/, screen: WishlistScreen },
     { pattern: /^#\/seller\/\w+/, screen: SellerScreen },
     { pattern: /^#\/account/, screen: AccountScreen },
+    { pattern: /^#\/messages/, screen: MessagesScreen },
   ],
 
   async handleRoute() {
     const hash = window.location.hash || '#/';
     const app = document.getElementById('app');
     if (!app) return;
+
+    // Route changes must never leave the cart/checkout drawer overlay on another page.
+    document.getElementById('quick-cart-drawer')?.classList.remove('open');
+    document.getElementById('drawer-backdrop')?.classList.remove('open');
 
     // Highlight active nav links
     document.querySelectorAll('.nav-link').forEach(link => {

@@ -1,3 +1,4 @@
+import { API } from './api.js';
 // ============================================
 // JustBuy — Seller Dashboard
 // Uses the same Store (theme, currency, toast) as the storefront.
@@ -9,9 +10,6 @@ import { ShaderGradient } from './shader-gradient.js';
 
 // ── Config ──────────────────────────────────────────
 const CONFIG = {
-    // Set to true to pull products/orders from the Spring Boot API
-    // (/api/products, /api/orders). Falls back to mock data if it fails.
-    useLiveApi: true,
     lowStockThreshold: 10,
     commissionRate: 0.10,
     storeName: 'TechNova Store',
@@ -56,81 +54,17 @@ function timeAgo(iso) {
     return `${Math.round(h / 24)} d ago`;
 }
 
-// ── Mock data (matches the seeded TechNova products) ─
-function buildMock() {
-    const daySales    = [38, 52, 41, 60, 47, 66, 72, 44, 58, 63, 55, 71, 79, 64];
-    const dayOrders   = [1, 2, 1, 1, 1, 2, 2, 1, 1, 2, 1, 2, 2, 2];
-    const weekSales   = [240, 255, 262, 280, 290, 305, 300, 318, 325, 340, 352, 331];
-    const weekOrders  = [5, 5, 6, 6, 6, 7, 7, 7, 8, 8, 9, 8];
-    const monthSales  = [700, 760, 740, 850, 930, 980, 1040, 1120, 1190, 1240, 1520, 1380];
-    const monthOrders = [14, 15, 15, 17, 18, 19, 21, 22, 23, 25, 27, 32];
-
+function createEmptyData() {
     return {
-        series: {
-            day:   { sales: daySales,   orders: dayOrders },
-            week:  { sales: weekSales,  orders: weekOrders },
-            month: { sales: monthSales, orders: monthOrders }
-        },
-        productCount: 86,
-        pendingOrders: 12,
-        pendingDeliveries: 7,
-        newReviews: 6,
-        pendingWithdrawals: { count: 1, amount: 450 },
-        categories: [
-            { name: 'Wearables', value: 3066 },
-            { name: 'Audio', value: 2969.67 },
-            { name: 'Tablets', value: 2443 },
-            { name: 'Accessories', value: 1633.62 },
-            { name: 'Lighting', value: 1559.76 },
-            { name: 'Other', value: 777.95 }
-        ],
-        topProducts: [
-            { name: 'ZenWatch 3 — Minimalist Smart Watch', units: 14, revenue: 3066, img: 'watch' },
-            { name: 'AuraSound Pro Wireless Earbuds', units: 33, revenue: 2969.67, img: 'earbuds' },
-            { name: 'SlimPad Ultra Tablet 11"', units: 7, revenue: 2443, img: 'tablet' },
-            { name: 'MicroHub 8-in-1 USB-C Dock', units: 38, revenue: 1633.62, img: 'hub' },
-            { name: 'FocusDesk Lamp — Wireless Charging', units: 24, revenue: 1559.76, img: 'lamp' }
-        ],
-        recentOrders: [
-            { id: 'JB-10240', customer: 'Nimali Perera', items: 'AuraSound Pro Wireless Earbuds', total: 89.99, status: 'pending', time: '4 min ago' },
-            { id: 'JB-10239', customer: 'Kasun Ranasinghe', items: 'ZenWatch 3 — Minimalist Smart Watch', total: 219, status: 'processing', time: '38 min ago' },
-            { id: 'JB-10238', customer: 'Amara Silva', items: 'MicroHub 8-in-1 USB-C Dock × 2', total: 85.98, status: 'shipped', time: '2 h ago' },
-            { id: 'JB-10237', customer: 'Dinuk Wijesinghe', items: 'SlimPad Ultra Tablet 11"', total: 349, status: 'pending', time: '3 h ago' },
-            { id: 'JB-10236', customer: 'Shanika Fernando', items: 'FocusDesk Lamp — Wireless Charging', total: 64.99, status: 'delivered', time: 'Yesterday' },
-            { id: 'JB-10235', customer: 'Ravi Mendis', items: 'AuraSound Pro Wireless Earbuds × 2', total: 179.98, status: 'cancelled', time: 'Yesterday' }
-        ],
-        lowStock: [
-            { name: 'AuraSound Pro Earbuds', variant: 'Midnight Black', stock: 0 },
-            { name: 'MicroHub USB-C Dock', variant: 'Space Gray', stock: 0 },
-            { name: 'SlimPad Ultra Tablet', variant: 'Silver', stock: 3 },
-            { name: 'FocusDesk Lamp', variant: 'White', stock: 4 },
-            { name: 'ZenWatch 3', variant: '45mm · Gold', stock: 5 },
-            { name: 'AuraSound Pro Earbuds', variant: 'Rose Gold', stock: 6 },
-            { name: 'MicroHub USB-C Dock', variant: 'Silver', stock: 8 }
-        ],
-        messages: [
-            { from: 'Nimali Perera', text: 'Hi! Does the earbuds case come with a USB-C cable?', time: '12 min ago', unread: true },
-            { from: 'Kasun Ranasinghe', text: 'Can I change the strap size on my ZenWatch order?', time: '1 h ago', unread: true },
-            { from: 'Amara Silva', text: 'Thanks, the dock arrived. Works great.', time: '5 h ago', unread: true },
-            { from: 'Dinuk Wijesinghe', text: 'Is the tablet stylus included in the box?', time: 'Yesterday', unread: true },
-            { from: 'Shanika Fernando', text: 'Where can I download the invoice?', time: '2 d ago', unread: false }
-        ],
-        reviews: [
-            { product: 'ZenWatch 3', rating: 5, text: 'Ceramic bezel feels premium and the battery easily lasts 5 days.', who: 'Sarah L.', time: '2 h ago' },
-            { product: 'AuraSound Pro Earbuds', rating: 4, text: 'Great sound and ANC. The app could use some polish.', who: 'David K.', time: '6 h ago' },
-            { product: 'MicroHub USB-C Dock', rating: 5, text: 'Plug and play, all 8 ports work with my laptop.', who: 'Omar R.', time: 'Yesterday' },
-            { product: 'FocusDesk Lamp', rating: 3, text: 'Good lamp, but the wireless charger runs a bit warm.', who: 'Chris W.', time: '2 d ago' }
-        ],
-        notifications: [
-            { icon: '🛒', text: 'New order JB-10240 from Nimali Perera', time: '4 min ago', unread: true },
-            { icon: '📦', text: 'SlimPad Ultra Tablet is low on stock (3 left)', time: '1 h ago', unread: true },
-            { icon: '💬', text: 'Kasun Ranasinghe sent you a message', time: '1 h ago', unread: true },
-            { icon: '⭐', text: 'New 5-star review on ZenWatch 3', time: '2 h ago', unread: false },
-            { icon: '🏦', text: 'Withdrawal request received and pending review', time: 'Yesterday', unread: false }
-        ]
+        series: { day: { sales: [], orders: [] }, week: { sales: [], orders: [] }, month: { sales: [], orders: [] } },
+        productCount: 0, pendingOrders: 0, pendingDeliveries: 0, newReviews: 0,
+        pendingWithdrawals: { count: 0, amount: 0 }, categories: [], topProducts: [], recentOrders: [], orders: [],
+        products: [], deliveries: [], lowStock: [], messages: [], reviews: [], notifications: [], productCategories: [],
+        attributes: [], withdrawals: [], discounts: [], coupons: [], vouchers: [], managers: [], productReviews: [],
+        conversations: [], storeProfile: {}, storeOpsSettings: {}, sellerProfile: {}, paymentMethods: [],
+        deliverySettings: {}, securityInfo: {}, vacationDetails: { startDate: '', endDate: '', message: '' }
     };
 }
-
 // Load every dashboard section from the logged-in seller's database records.
 async function tryLive(data) {
     try {
@@ -155,8 +89,10 @@ async function tryLive(data) {
             createdAt: order.createdAt,
             time: timeAgo(order.createdAt)
         });
+        const categories = await API.getCategories();
         Object.assign(data, payload, {
             seller: payload.seller || seller,
+            productCategories: categories.map((category) => ({ id: category.id, name: category.name, status: category.active === false ? 'inactive' : 'active' })),
             orders: (payload.orders || []).map(normalizeOrder),
             recentOrders: (payload.recentOrders || []).map(normalizeOrder),
             products: payload.products || [],
@@ -793,9 +729,8 @@ async function init() {
     Store.initTheme();
     try { new ShaderGradient('bg-shader-canvas'); } catch (e) { console.warn('Shader background:', e); }
 
-    data = buildMock();
-    Object.assign(data, buildExtraMock());
-    if (CONFIG.useLiveApi) await tryLive(data);
+    data = createEmptyData();
+    await tryLive(data);
 
     setupChrome();
     setupExtraChrome();
@@ -825,215 +760,12 @@ document.addEventListener('DOMContentLoaded', init);
 // Marketing, Store and Settings pages.
 //
 // Everything below mutates the same in-memory `data` object built
-// by buildMock()/buildExtraMock() — exactly like the existing
-// dashboard code already does for `data.notifications` (mark all
-// read) and vacation mode. Nothing here is persisted; a reload
-// regenerates fresh mock data, same as today. When the real
-// Spring Boot API is ready, replace the relevant data.<x> arrays
-// with fetch() results the same way `tryLive()` does above, and
-// swap each mutation (e.g. `o.status = val`) for the matching
-// PUT/PATCH call.
 // ============================================================
 
 let ORIGINAL_GREETING = '';
 let ORIGINAL_DATE = '';
 
 // ── Extra mock data ─────────────────────────────────
-function buildExtraMock() {
-    const now = new Date();
-    const daysAgo = (n) => { const d = new Date(now); d.setDate(d.getDate() - n); return d.toISOString(); };
-    const user = Store.state.user || {};
-
-    const customers = ['Nimali Perera', 'Kasun Ranasinghe', 'Amara Silva', 'Dinuk Wijesinghe',
-        'Shanika Fernando', 'Ravi Mendis', 'Tharindu Jayasuriya', 'Iresha Gunawardena',
-        'Chamod Abeysekera', 'Sanduni Rathnayake'];
-
-    const products = [
-        { id: 'PRD-1001', sku: 'ZW3-BLK-45', name: 'ZenWatch 3 — Minimalist Smart Watch', category: 'Wearables', price: 219, stock: 18, status: 'active', img: 'watch' },
-        { id: 'PRD-1002', sku: 'ASP-EAR-BLK', name: 'AuraSound Pro Wireless Earbuds', category: 'Audio', price: 89.99, stock: 0, status: 'active', img: 'earbuds' },
-        { id: 'PRD-1003', sku: 'SPU-TAB-11', name: 'SlimPad Ultra Tablet 11"', category: 'Tablets', price: 349, stock: 3, status: 'active', img: 'tablet' },
-        { id: 'PRD-1004', sku: 'MH8-DCK-SG', name: 'MicroHub 8-in-1 USB-C Dock', category: 'Accessories', price: 42.99, stock: 0, status: 'active', img: 'hub' },
-        { id: 'PRD-1005', sku: 'FDL-LMP-WHT', name: 'FocusDesk Lamp — Wireless Charging', category: 'Lighting', price: 64.99, stock: 4, status: 'active', img: 'lamp' },
-        { id: 'PRD-1006', sku: 'ZW3-GLD-45', name: 'ZenWatch 3 — 45mm Gold', category: 'Wearables', price: 229, stock: 5, status: 'active', img: 'watch2' },
-        { id: 'PRD-1007', sku: 'ASP-EAR-RG', name: 'AuraSound Pro Earbuds — Rose Gold', category: 'Audio', price: 94.99, stock: 6, status: 'active', img: 'earbuds2' },
-        { id: 'PRD-1008', sku: 'MH8-DCK-SLV', name: 'MicroHub USB-C Dock — Silver', category: 'Accessories', price: 42.99, stock: 8, status: 'active', img: 'hub2' },
-        { id: 'PRD-1009', sku: 'SPU-CASE', name: 'SlimPad Folio Case', category: 'Accessories', price: 24.99, stock: 32, status: 'active', img: 'case' },
-        { id: 'PRD-1010', sku: 'AS-CBL-USBC', name: 'AuraSound USB-C Charging Cable', category: 'Accessories', price: 12.99, stock: 60, status: 'active', img: 'cable' },
-        { id: 'PRD-1011', sku: 'FDL-BULB', name: 'FocusDesk Replacement Bulb', category: 'Lighting', price: 8.99, stock: 0, status: 'inactive', img: 'bulb' },
-        { id: 'PRD-1012', sku: 'ZW3-STRAP', name: 'ZenWatch Silicone Strap', category: 'Wearables', price: 14.99, stock: 41, status: 'active', img: 'strap' }
-    ];
-
-    const orderStatuses = ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'delivered', 'delivered', 'cancelled'];
-    const orders = [];
-    for (let i = 0; i < 24; i++) {
-        const cust = customers[i % customers.length];
-        const prod = products[i % products.length];
-        const qty = 1 + (i % 3);
-        const status = orderStatuses[i % orderStatuses.length];
-        orders.push({
-            id: `JB-${10300 - i}`,
-            customer: cust,
-            email: cust.toLowerCase().replace(/ /g, '.') + '@example.com',
-            address: `${12 + i} Galle Road, Colombo ${(i % 15) + 1}`,
-            items: [{ name: prod.name, qty, price: prod.price }],
-            total: +(prod.price * qty).toFixed(2),
-            status,
-            paymentStatus: status === 'cancelled' ? 'refunded' : (status === 'pending' ? 'unpaid' : 'paid'),
-            createdAt: daysAgo(i),
-            time: timeAgo(daysAgo(i))
-        });
-    }
-
-    const deliveries = orders
-        .filter((o) => !['pending', 'cancelled'].includes(o.status))
-        .map((o, i) => ({
-            id: `DL-${9000 + i}`,
-            orderId: o.id,
-            customer: o.customer,
-            address: o.address,
-            carrier: ['CityExpress', 'IslandPost', 'JustBuy Logistics'][i % 3],
-            tracking: `TRK${100000 + i}LK`,
-            status: o.status === 'confirmed' || o.status === 'processing' ? 'processing'
-                : o.status === 'shipped' ? (i % 2 === 0 ? 'shipped' : 'out_for_delivery')
-                    : 'delivered',
-            updatedAt: o.createdAt
-        }));
-
-    const returns = [
-        { id: 'RT-501', orderId: orders[2].id, customer: orders[2].customer, product: orders[2].items[0].name, reason: 'Arrived with a scratch on the casing', amount: orders[2].total, status: 'requested', requestedAt: daysAgo(1) },
-        { id: 'RT-502', orderId: orders[5].id, customer: orders[5].customer, product: orders[5].items[0].name, reason: 'Ordered the wrong size', amount: orders[5].total, status: 'approved', requestedAt: daysAgo(4) },
-        { id: 'RT-503', orderId: orders[9].id, customer: orders[9].customer, product: orders[9].items[0].name, reason: 'No longer needed', amount: orders[9].total, status: 'refunded', requestedAt: daysAgo(9) },
-        { id: 'RT-504', orderId: orders[14].id, customer: orders[14].customer, product: orders[14].items[0].name, reason: 'Item did not match description', amount: orders[14].total, status: 'rejected', requestedAt: daysAgo(12) }
-    ];
-
-    const cancellations = [
-        { id: 'CN-201', orderId: orders[6].id, customer: orders[6].customer, reason: 'Found it cheaper elsewhere', status: 'requested', requestedAt: daysAgo(0) },
-        { id: 'CN-202', orderId: orders[11].id, customer: orders[11].customer, reason: 'Ordered by mistake', status: 'approved', requestedAt: daysAgo(3) },
-        { id: 'CN-203', orderId: orders[18].id, customer: orders[18].customer, reason: 'Delivery window too long', status: 'rejected', requestedAt: daysAgo(6) }
-    ];
-
-    const productCategories = [
-        { id: 'CAT-1', name: 'Wearables', status: 'active' },
-        { id: 'CAT-2', name: 'Audio', status: 'active' },
-        { id: 'CAT-3', name: 'Tablets', status: 'active' },
-        { id: 'CAT-4', name: 'Accessories', status: 'active' },
-        { id: 'CAT-5', name: 'Lighting', status: 'active' }
-    ];
-
-    const attributes = [
-        { id: 'ATTR-1', name: 'Color', values: ['Black', 'White', 'Gold', 'Rose Gold', 'Silver'] },
-        { id: 'ATTR-2', name: 'Storage', values: ['64GB', '128GB', '256GB'] },
-        { id: 'ATTR-3', name: 'Band size', values: ['S/M', 'M/L'] }
-    ];
-
-    const withdrawals = [
-        { id: 'WD-901', amount: 450, method: 'Commercial Bank •••• 4471', status: 'pending', requestedAt: daysAgo(1) },
-        { id: 'WD-902', amount: 620, method: 'Commercial Bank •••• 4471', status: 'paid', requestedAt: daysAgo(18) },
-        { id: 'WD-903', amount: 300, method: 'JustBuy Wallet', status: 'paid', requestedAt: daysAgo(32) },
-        { id: 'WD-904', amount: 150, method: 'Commercial Bank •••• 4471', status: 'cancelled', requestedAt: daysAgo(40) }
-    ];
-
-    const discounts = [
-        { id: 'DIS-1', name: 'Wearables spring sale', type: 'percentage', value: 15, scope: 'Wearables', startDate: '2026-09-01', endDate: '2026-10-15', status: 'active' },
-        { id: 'DIS-2', name: '$10 off accessories', type: 'fixed', value: 10, scope: 'Accessories', startDate: '2026-08-20', endDate: '2026-09-30', status: 'active' }
-    ];
-    const coupons = [
-        { id: 'CPN-1', code: 'WELCOME10', type: 'percentage', value: 10, minOrder: 30, usageLimit: 500, used: 128, expiresAt: '2026-12-31', status: 'active' },
-        { id: 'CPN-2', code: 'FREESHIP', type: 'fixed', value: 4.99, minOrder: 0, usageLimit: 200, used: 200, expiresAt: '2026-09-30', status: 'inactive' }
-    ];
-    const vouchers = [
-        { id: 'VCH-1', code: 'GIFT25', value: 25, validUntil: '2026-11-30', usageLimit: 100, used: 12, status: 'active' }
-    ];
-
-    const managers = [
-        { id: 'MGR-1', name: 'Sahan Kodithuwakku', email: 'sahan@technova.lk', role: 'Manager', permissions: ['orders', 'products', 'finance'], status: 'active' },
-        { id: 'MGR-2', name: 'Dilki Wickramasinghe', email: 'dilki@technova.lk', role: 'Support', permissions: ['orders', 'messages'], status: 'active' }
-    ];
-
-    const productReviews = [
-        { id: 'RV-1', product: 'ZenWatch 3', rating: 5, text: 'Ceramic bezel feels premium and the battery easily lasts 5 days.', who: 'Sarah L.', time: '2 h ago', replied: false, reply: '' },
-        { id: 'RV-2', product: 'AuraSound Pro Earbuds', rating: 4, text: 'Great sound and ANC. The app could use some polish.', who: 'David K.', time: '6 h ago', replied: false, reply: '' },
-        { id: 'RV-3', product: 'MicroHub USB-C Dock', rating: 5, text: 'Plug and play, all 8 ports work with my laptop.', who: 'Omar R.', time: 'Yesterday', replied: true, reply: 'Thanks Omar — glad it\'s working well for your setup!' },
-        { id: 'RV-4', product: 'FocusDesk Lamp', rating: 3, text: 'Good lamp, but the wireless charger runs a bit warm.', who: 'Chris W.', time: '2 d ago', replied: false, reply: '' },
-        { id: 'RV-5', product: 'SlimPad Ultra Tablet 11"', rating: 5, text: 'Screen is gorgeous and the stylus is a great bundle.', who: 'Priyanka M.', time: '4 d ago', replied: false, reply: '' }
-    ];
-
-    const conversationSeed = [
-        { customer: 'Nimali Perera', unread: true, messages: [
-                { from: 'customer', text: 'Hi! Does the earbuds case come with a USB-C cable?', at: daysAgo(0) }
-            ] },
-        { customer: 'Kasun Ranasinghe', unread: true, messages: [
-                { from: 'customer', text: 'Can I change the strap size on my ZenWatch order?', at: daysAgo(0) },
-                { from: 'seller', text: 'Of course — which size would you like instead?', at: daysAgo(0) }
-            ] },
-        { customer: 'Amara Silva', unread: false, messages: [
-                { from: 'customer', text: 'Thanks, the dock arrived. Works great.', at: daysAgo(1) },
-                { from: 'seller', text: 'Wonderful to hear, thanks for letting us know!', at: daysAgo(1) }
-            ] },
-        { customer: 'Dinuk Wijesinghe', unread: true, messages: [
-                { from: 'customer', text: 'Is the tablet stylus included in the box?', at: daysAgo(1) }
-            ] },
-        { customer: 'Shanika Fernando', unread: false, messages: [
-                { from: 'customer', text: 'Where can I download the invoice?', at: daysAgo(2) },
-                { from: 'seller', text: 'You can grab it from the order detail page — I\'ve also emailed a copy.', at: daysAgo(2) }
-            ] }
-    ];
-    const conversations = conversationSeed.map((c, i) => ({ id: `CV-${i + 1}`, ...c }));
-
-    return {
-        products,
-        orders,
-        deliveries,
-        returns,
-        cancellations,
-        productCategories,
-        attributes,
-        withdrawals,
-        discounts,
-        coupons,
-        vouchers,
-        managers,
-        productReviews,
-        conversations,
-        storeProfile: {
-            name: CONFIG.storeName,
-            category: 'Electronics & Gadgets',
-            description: 'Curated smart-home and personal-tech accessories, hand-picked for design and durability.',
-            contactEmail: 'hello@technova.lk',
-            contactPhone: '+94 77 123 4567',
-            returnPolicy: 'Returns accepted within 14 days of delivery for unused items in original packaging.'
-        },
-        storeOpsSettings: { autoAcceptOrders: false, orderNotifications: true, currency: Store.state.currency || 'USD' },
-        sellerProfile: {
-            name: user.name || 'Seller',
-            email: user.email || 'seller@technova.lk',
-            phone: '+94 71 987 6543',
-            bio: 'Selling curated audio and workspace hardware since 2024. 4.9★ across 617 units sold.'
-        },
-        paymentMethods: [
-            { id: 'PM-1', type: 'Bank Transfer', label: 'Commercial Bank •••• 4471', isDefault: true },
-            { id: 'PM-2', type: 'JustBuy Wallet', label: 'JustBuy Wallet', isDefault: false }
-        ],
-        deliverySettings: {
-            options: [
-                { id: 'DO-1', name: 'Standard Delivery', days: '3–5 days', fee: 4.99, enabled: true },
-                { id: 'DO-2', name: 'Express Delivery', days: '1–2 days', fee: 9.99, enabled: true },
-                { id: 'DO-3', name: 'Store Pickup', days: 'Same day', fee: 0, enabled: false }
-            ],
-            freeShippingThreshold: 75
-        },
-        securityInfo: {
-            twoFactorEnabled: false,
-            lastPasswordChange: daysAgo(40),
-            sessions: [
-                { device: 'Chrome on macOS', location: 'Colombo, LK', current: true, lastActive: 'Now' },
-                { device: 'JustBuy App — iPhone', location: 'Colombo, LK', current: false, lastActive: '2 d ago' }
-            ]
-        },
-        vacationDetails: { startDate: '', endDate: '', message: 'We are currently away and will resume shipping soon.' }
-    };
-}
-
 // Extra status labels used by the new sections (existing pill colors are
 // extended below in seller-dashboard.css; anything not styled there still
 // renders correctly with the base .sd-pill look).
@@ -1496,7 +1228,7 @@ function openProductForm(p) {
 
 // ── Products > Add Product (standalone page) ─────────
 function renderAddProductPage(container) {
-    const categories = [...new Set(data.products.map((p) => p.category))];
+    const categories = data.productCategories || [];
     container.innerHTML = `
     <div class="sd-section-head"><h2>Add Product</h2><p>List a new item on your storefront.</p></div>
     <div class="sd-card glass">
@@ -1504,48 +1236,76 @@ function renderAddProductPage(container) {
         <div class="sd-form-grid">
           <label class="sd-field sd-field-full"><span>Product name</span><input type="text" name="name" required/></label>
           <label class="sd-field sd-field-full"><span>Description</span><textarea name="description" rows="3"></textarea></label>
+          <label class="sd-field sd-field-full"><span>Product image URLs (comma separated)</span><input type="text" name="imageUrls" placeholder="https://... , https://..."/></label>
+          <label class="sd-field sd-field-full"><span>Upload product images from this computer</span><input type="file" name="productImages" accept="image/*" multiple/><small class="sd-hint">Up to 5 MB per image. Files are stored in the database.</small></label>
           <label class="sd-field"><span>Category</span>
-            <select name="category">${categories.map((c) => `<option value="${esc(c)}">${esc(c)}</option>`).join('')}</select>
+            <select name="category" ${categories.length ? '' : 'disabled'}>${categories.map((c) => `<option value="${esc(c.id)}">${esc(c.name)}</option>`).join('')}</select>
           </label>
           <label class="sd-field"><span>SKU</span><input type="text" name="sku" required/></label>
+          <label class="sd-field"><span>Colors (comma separated)</span><input type="text" name="colors" placeholder="Black, White, Blue"/></label>
+          <label class="sd-field"><span>Sizes / specifications (comma separated)</span><input type="text" name="sizes" placeholder="Small, Medium, Large"/></label>
           <label class="sd-field"><span>Price (USD)</span><input type="number" name="price" min="0" step="0.01" required/></label>
+          <label class="sd-field"><span>Original price (USD)</span><input type="number" name="originalPrice" min="0" step="0.01"/></label>
           <label class="sd-field"><span>Discount %</span><input type="number" name="discount" min="0" max="100" step="1" value="0"/></label>
           <label class="sd-field"><span>Stock quantity</span><input type="number" name="stock" min="0" step="1" required/></label>
-          <label class="sd-field"><span>Status</span><select name="status"><option value="active">Active</option><option value="inactive">Inactive</option></select></label>
+          <label class="sd-field"><span>Buy 2–4 discount %</span><input type="number" name="bulk2to4" min="0" max="100" step="0.01" value="0"/></label>
+          <label class="sd-field"><span>Buy 5+ discount %</span><input type="number" name="bulk5plus" min="0" max="100" step="0.01" value="0"/></label>
+          <label class="sd-field sd-field-full"><span>Shipping information</span><input type="text" name="shippingInfo" placeholder="Seller-entered shipping method and fee"/></label>
+          <label class="sd-field"><span>Delivery estimate</span><input type="text" name="deliveryEstimate" placeholder="3–5 business days"/></label>
+          <label class="sd-field sd-field-full"><span>Return policy</span><textarea name="returnPolicy" rows="2" placeholder="Seller-entered return conditions"></textarea></label>
         </div>
         <div class="sd-modal-actions" style="justify-content:flex-start;">
           <button type="submit" class="btn btn-primary btn-sm btn-liquid">Add product</button>
           <button type="button" class="btn btn-glass btn-sm" id="sd-cancel-add-product">Cancel</button>
-          <span class="sd-hint" id="sd-add-product-hint"></span>
+          <span class="sd-hint" id="sd-add-product-hint">${categories.length ? '' : 'Create a category first, then add a product.'}</span>
         </div>
       </form>
     </div>`;
 
     $('#sd-cancel-add-product').addEventListener('click', () => navigate('products-all'));
-    $('#sd-add-product-form').addEventListener('submit', (e) => {
+    $('#sd-add-product-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const fd = new FormData(e.target);
         const name = (fd.get('name') || '').toString().trim();
         const sku = (fd.get('sku') || '').toString().trim();
         const price = Number(fd.get('price'));
         const stock = Number(fd.get('stock'));
+        const categoryId = Number(fd.get('category'));
+        const session = JSON.parse(localStorage.getItem('jb_user') || 'null');
         const hint = $('#sd-add-product-hint');
-        if (!name || !sku || isNaN(price) || isNaN(stock)) {
-            hint.textContent = 'Please fill in all required fields.';
+        if (!name || !sku || !categoryId || isNaN(price) || isNaN(stock) || !session?.id) {
+            hint.textContent = 'Please fill in all required fields and sign in again if needed.';
             hint.classList.add('error');
             return;
         }
-        data.products.unshift({
-            id: 'PRD-' + Math.floor(2000 + Math.random() * 8000),
-            sku, name,
-            category: fd.get('category') || 'Uncategorized',
-            price, discount: Number(fd.get('discount')) || 0,
-            stock, status: fd.get('status'), img: 'watch', description: fd.get('description') || ''
-        });
-        data.productCount = data.products.length;
-        Store.toast(`${name} added to your catalog`, 'success');
-        renderStats();
-        navigate('products-all');
+        try {
+            const imageUrls = (fd.get('imageUrls') || '').toString().split(',').map((url) => url.trim()).filter(Boolean).join(',');
+            const bulkPricing = JSON.stringify([
+                { min: 2, max: 4, discountPercent: Number(fd.get('bulk2to4')) || 0 },
+                { min: 5, discountPercent: Number(fd.get('bulk5plus')) || 0 }
+            ].filter((tier) => tier.discountPercent > 0));
+            const savedProduct = await API.createProduct({
+                name, slug: sku.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''), sku,
+                description: fd.get('description') || '', price,
+                originalPrice: Number(fd.get('originalPrice')) || price,
+                discountPercent: Number(fd.get('discount')) || 0, stock,
+                thumbnailUrl: imageUrls.split(',')[0] || '', imageUrls,
+                colors: fd.get('colors') || '', sizes: fd.get('sizes') || '', bulkPricing,
+                shippingInfo: fd.get('shippingInfo') || '', returnPolicy: fd.get('returnPolicy') || '',
+                deliveryEstimate: fd.get('deliveryEstimate') || '', rating: 0, reviewCount: 0, soldCount: 0,
+                featured: false, flashDeal: false, freeShipping: false,
+                tags: sku, category: { id: categoryId }, seller: { id: Number(session.id) }
+            });
+            const localImages = fd.getAll('productImages').filter((file) => file && file.size);
+            if (savedProduct?.id && localImages.length) await API.uploadProductImages(savedProduct.id, localImages);
+            await tryLive(data);
+            Store.toast(`${name} added to your catalog`, 'success');
+            renderStats();
+            navigate('products-all');
+        } catch (error) {
+            hint.textContent = error.message || 'Could not save the product.';
+            hint.classList.add('error');
+        }
     });
 }
 
@@ -1569,7 +1329,7 @@ function renderCategoriesPage(container) {
             { id: 'delete', label: 'Delete', variant: 'danger', onClick: () => {
                     const inUse = data.products.some((p) => p.category === c.name);
                     if (inUse) { Store.toast(`Can't delete "${c.name}" — products still use it`, 'warning'); return; }
-                    confirmAction({ title: `Delete "${c.name}"?`, message: 'This category has no products and can be safely removed.', onConfirm: () => { data.productCategories = data.productCategories.filter((x) => x.id !== c.id); renderRoute(); } });
+                    confirmAction({ title: `Delete "${c.name}"?`, message: 'This category has no products and can be safely removed.', onConfirm: async () => { try { await API.deleteCategory(c.id); await tryLive(data); renderRoute(); } catch (error) { Store.toast(error.message, 'warning'); } } });
                 } }
         ],
         emptyText: 'No categories yet.'
@@ -1581,10 +1341,13 @@ function openCategoryForm(c) {
         fields: [{ name: 'name', label: 'Category name', full: true, required: true }],
         initial: c || {},
         submitLabel: c ? 'Save changes' : 'Add category',
-        onSubmit: (vals) => {
-            if (c) c.name = vals.name;
-            else data.productCategories.push({ id: 'CAT-' + Date.now(), name: vals.name, status: 'active' });
-            closeModal(); Store.toast('Category saved', 'success'); renderRoute();
+        onSubmit: async (vals) => {
+            try {
+                if (c) await API.updateCategory(c.id, { name: vals.name });
+                else await API.createCategory({ name: vals.name });
+                await tryLive(data);
+                closeModal(); Store.toast('Category saved', 'success'); renderRoute();
+            } catch (error) { Store.toast(error.message, 'warning'); }
         }
     });
 }
@@ -1679,8 +1442,16 @@ function renderInventoryPage(container) {
 
 // ── Messages ──────────────────────────────────────────
 let activeConversationId = null;
-function renderMessagesPage(container) {
-    const convos = data.conversations;
+async function renderMessagesPage(container) {
+    const session = JSON.parse(localStorage.getItem('jb_user') || 'null');
+    let convos = [];
+    try {
+        const saved = await API.getChatConversations({ sellerId: session?.id });
+        convos = await Promise.all(saved.map(async (conversation) => ({
+            id: conversation.id, customer: conversation.customerName, unread: false,
+            messages: (await API.getChatMessages(conversation.id)).map((message) => ({ from: Number(message.senderId) === Number(session?.id) ? 'seller' : 'customer', text: message.body, at: message.createdAt }))
+        })));
+    } catch (error) { Store.toast(error.message || 'Could not load messages.', 'warning'); }
     if (!activeConversationId && convos.length) activeConversationId = convos[0].id;
 
     function draw() {
@@ -1715,15 +1486,17 @@ function renderMessagesPage(container) {
 
         const compose = $('#sd-thread-compose');
         if (compose) {
-            compose.addEventListener('submit', (e) => {
+                compose.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const input = $('#sd-thread-input');
                 const text = input.value.trim();
                 if (!text) return;
-                active.messages.push({ from: 'seller', text, at: new Date().toISOString() });
-                active.unread = false;
-                input.value = '';
-                draw();
+                try {
+                    await API.sendChatMessage(active.id, { senderType: 'SELLER', senderId: Number(session.id), senderName: session.name || session.fullName || 'Seller', body: text });
+                    active.unread = false;
+                    input.value = '';
+                    await renderMessagesPage(container);
+                } catch (error) { Store.toast(error.message || 'Could not send message.', 'warning'); }
             });
         }
     }
@@ -2118,6 +1891,7 @@ function renderProfilePage(container) {
     <div class="sd-card glass">
       <form id="sd-profile-form" class="sd-form">
         <div class="sd-form-grid">
+          <label class="sd-field sd-field-full"><span>Profile picture</span><input id="sd-profile-picture" type="file" accept="image/*"/><small class="sd-hint">Stored securely in your account database.</small></label>
           <label class="sd-field"><span>Full name</span><input type="text" name="name" value="${esc(sp.name)}" required/></label>
           <label class="sd-field"><span>Email</span><input type="email" name="email" value="${esc(sp.email)}" required/></label>
           <label class="sd-field"><span>Phone number</span><input type="tel" name="phone" value="${esc(sp.phone)}"/></label>
@@ -2134,6 +1908,11 @@ function renderProfilePage(container) {
       <p class="sd-hint sd-hint-static">${esc(sp.bio)}</p>
     </div>`;
 
+    $('#sd-profile-picture')?.addEventListener('change', async (e) => {
+        const file = e.target.files?.[0]; if (!file) return;
+        try { const saved = await API.uploadProfileImage(file); const user = JSON.parse(localStorage.getItem('jb_user') || 'null') || {}; user.avatar = saved.imageUrl; localStorage.setItem('jb_user', JSON.stringify(user)); Store.toast('Profile picture updated', 'success'); } catch (error) { Store.toast(error.message, 'warning'); }
+        e.target.value = '';
+    });
     $('#sd-profile-form').addEventListener('submit', (e) => {
         e.preventDefault();
         const fd = new FormData(e.target);

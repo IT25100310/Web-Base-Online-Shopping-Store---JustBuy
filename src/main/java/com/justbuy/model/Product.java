@@ -29,6 +29,8 @@ public class Product {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    private String sku;
+
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
 
@@ -45,6 +47,18 @@ public class Product {
     private String thumbnailUrl;
     private String colors;              // JSON-like "Red,Blue,Green"
     private String sizes;               // "XS,S,M,L,XL"
+
+    /** JSON array of seller-defined quantity tiers, e.g. [{"min":2,"max":4,"discountPercent":8}]. */
+    @Column(columnDefinition = "TEXT")
+    private String bulkPricing;
+
+    @Column(columnDefinition = "TEXT")
+    private String shippingInfo;
+
+    @Column(columnDefinition = "TEXT")
+    private String returnPolicy;
+
+    private String deliveryEstimate;
     private Double rating;
     private Integer reviewCount;
     private Integer soldCount;

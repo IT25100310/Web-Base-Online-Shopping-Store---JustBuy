@@ -2,6 +2,10 @@ package com.justbuy.controller;
 
 
 import com.justbuy.model.User;
+import com.justbuy.repository.AdminAccountRepository;
+import com.justbuy.repository.DriverRepository;
+import com.justbuy.repository.SellerRepository;
+import com.justbuy.repository.SupportAgentRepository;
 import com.justbuy.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,6 +22,10 @@ import java.util.Map;
 public class AuthController {
 
     private final UserRepository userRepository;
+    private final SellerRepository sellerRepository;
+    private final DriverRepository driverRepository;
+    private final AdminAccountRepository adminAccountRepository;
+    private final SupportAgentRepository supportAgentRepository;
     private final PasswordEncoder passwordEncoder;
 
     // ==========================================
@@ -61,7 +69,7 @@ public class AuthController {
         }
 
         // Check existing customer
-        if (userRepository.existsByEmailIgnoreCase(email)) {
+        if (emailExistsAnywhere(email)) {
             return ResponseEntity
                     .status(HttpStatus.CONFLICT)
                     .body(Map.of("message", "An account with this email already exists."));
@@ -85,6 +93,14 @@ public class AuthController {
                         "email", savedUser.getEmail(),
                         "role", savedUser.getRole()
                 ));
+    }
+
+    private boolean emailExistsAnywhere(String email) {
+        return userRepository.existsByEmailIgnoreCase(email)
+                || sellerRepository.findByEmailIgnoreCase(email).isPresent()
+                || driverRepository.findByEmailIgnoreCase(email).isPresent()
+                || adminAccountRepository.findByEmailIgnoreCase(email).isPresent()
+                || supportAgentRepository.findByEmailIgnoreCase(email).isPresent();
     }
 
 

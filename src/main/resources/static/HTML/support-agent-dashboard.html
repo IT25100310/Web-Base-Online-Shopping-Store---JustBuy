@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Support Agent Dashboard — JustBuy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/tokens.css" />
+  <link rel="stylesheet" href="../css/base.css" />
+  <link rel="stylesheet" href="../css/components.css" />
+  <link rel="stylesheet" href="../css/animations.css" />
+  <link rel="stylesheet" href="../css/seller-dashboard.css" />
+  <link rel="stylesheet" href="../css/support-agent-dashboard.css" />
+</head>
+<body>
+  <canvas id="bg-shader-canvas"></canvas>
+  <div class="sd-shell support-shell" id="support-shell">
+    <aside class="sd-sidebar glass-lg" id="sd-sidebar" aria-label="Support navigation">
+      <div class="sd-sidebar-head">
+        <a href="/HTML/index.html#/" class="nav-logo" aria-label="JustBuy home"><span class="logo-mark">⚡</span><span class="logo-name">Just<span class="logo-accent">Buy</span></span></a>
+        <span class="sd-role-tag support-role-tag">Support</span>
+      </div>
+      <div class="sd-store-card glass support-agent-card">
+        <div class="support-agent-avatar" id="agent-initials">SA</div>
+        <div class="sd-store-meta"><strong id="agent-name">Support Agent</strong><span id="agent-status">● Available</span></div>
+      </div>
+      <nav class="sd-nav" id="support-nav" aria-label="Support agent menu"></nav>
+      <div class="sd-sidebar-foot">
+        <div class="support-availability"><span><i></i> Available for tickets</span><button class="sd-switch" id="availability-switch" role="switch" aria-checked="true"><span class="sd-switch-knob"></span></button></div>
+        <a href="login.html" class="btn btn-glass btn-sm btn-block" id="support-logout">🚪 Log out</a>
+      </div>
+    </aside>
+    <div class="sd-backdrop" id="sd-backdrop"></div>
+
+    <main class="sd-main">
+      <header class="sd-topbar glass">
+        <button class="sd-icon-btn" id="sd-menu-btn" aria-label="Open menu" aria-controls="sd-sidebar" aria-expanded="false">☰</button>
+        <div class="sd-topbar-title"><h1 id="support-greeting">Good morning</h1><p id="support-date"></p></div>
+        <form class="sd-search glass" id="support-search-form" role="search"><span aria-hidden="true">⌕</span><input id="support-search" type="search" placeholder="Search tickets, customers, orders" aria-label="Search tickets, customers, orders" /></form>
+        <div class="sd-topbar-actions"><button class="btn btn-primary btn-sm btn-liquid" id="new-ticket-btn">+ New ticket</button><button class="sd-icon-btn glass" id="sd-theme-btn" aria-label="Toggle dark mode">🌙</button><button class="sd-icon-btn glass" id="support-bell" aria-label="Notifications">🔔<span class="counter-badge" id="support-bell-count">4</span></button><button class="support-profile-chip" id="support-profile" aria-label="Agent profile"><span id="profile-initials">SA</span></button></div>
+      </header>
+
+      <div class="sd-content support-content" id="support-content">
+        <section class="support-welcome glass"><div><p class="eyebrow">SUPPORT OPERATIONS</p><h2>Keep every customer moving forward.</h2><p>Review your queue, respond to customers, and resolve marketplace issues from one calm workspace.</p></div><div class="support-welcome-mark">🎧</div></section>
+        <section aria-labelledby="overview-title"><div class="sd-section-head"><h2 id="overview-title">Overview</h2><p>Live support workload at a glance.</p></div><div class="support-stat-grid" id="support-stats"></div></section>
+        <section class="sd-row sd-row-2-1 support-main-grid">
+          <article class="sd-card glass"><div class="sd-card-head"><div><h3>Ticket queue</h3><p>Prioritize what needs attention first.</p></div><a href="#/all-tickets" class="sd-link">View all</a></div><div class="support-filter-row"><button class="support-filter active" data-filter="all">All</button><button class="support-filter" data-filter="urgent">Urgent</button><button class="support-filter" data-filter="mine">My tickets</button><button class="support-filter" data-filter="pending">Pending reply</button></div><div class="support-ticket-list" id="ticket-list"></div></article>
+          <article class="sd-card glass"><div class="sd-card-head"><div><h3>Today’s focus</h3><p>Service quality signals.</p></div></div><div class="support-score"><div class="support-score-ring"><strong>94%</strong><span>CSAT</span></div><div><strong>Excellent work</strong><p>4.7 average customer rating this month.</p></div></div><div class="support-mini-list"><div><span>First response</span><strong>18 min</strong></div><div><span>Resolution time</span><strong>6.4 h</strong></div><div><span>SLA at risk</span><strong class="text-warn">3 tickets</strong></div></div></article>
+        </section>
+        <section class="sd-row sd-row-3 support-lower-grid">
+          <article class="sd-card glass"><div class="sd-card-head"><h3>Recent activity</h3><a href="#/all-tickets" class="sd-link">See all</a></div><ul class="support-activity" id="support-activity"></ul></article>
+          <article class="sd-card glass"><div class="sd-card-head"><h3>Returns & refunds</h3><a href="#/returns-refunds" class="sd-link">Open queue</a></div><div class="support-return-card"><span class="support-return-icon">↩</span><div><strong>8 requests need review</strong><p>3 are approaching their return deadline.</p></div></div><div class="support-progress"><div><span>Refunds processed</span><strong>$2,480</strong></div><div class="support-progress-track"><span style="width:72%"></span></div></div></article>
+          <article class="sd-card glass"><div class="sd-card-head"><h3>Quick replies</h3><a href="#/canned-responses" class="sd-link">Manage</a></div><div class="support-quick-replies"><button data-template="shipping">Shipping delay</button><button data-template="refund">Refund request</button><button data-template="password">Password reset</button><button data-template="availability">Product availability</button></div></article>
+        </section>
+        <section class="sd-card glass support-detail-preview" id="support-detail-preview" hidden></section>
+      </div>
+    </main>
+  </div>
+  <div class="support-toast" id="support-toast" role="status" aria-live="polite"></div>
+  <script type="module" src="../js/support-agent-dashboard.js"></script>
+</body>
+</html>
