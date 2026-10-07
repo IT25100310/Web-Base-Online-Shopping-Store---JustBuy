@@ -57,6 +57,16 @@ public class ProductService {
         return productRepo.findByCategoryId(categoryId, PageRequest.of(page, size, sorting));
     }
 
+    public List<Product> getByCategoryName(String category, int page, int size, String sort) {
+        Sort sorting = switch (sort) {
+            case "price_asc", "price-low" -> Sort.by("price").ascending();
+            case "price_desc", "price-high" -> Sort.by("price").descending();
+            case "rating" -> Sort.by("rating").descending();
+            default -> Sort.by("soldCount").descending();
+        };
+        return productRepo.findByCategoryNameIgnoreCase(category, PageRequest.of(page, size, sorting));
+    }
+
     public List<Product> getBySeller(Long sellerId, int page, int size) {
         return productRepo.findBySellerId(sellerId, PageRequest.of(page, size, Sort.by("createdAt").descending()));
     }
